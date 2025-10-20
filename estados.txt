@@ -1,0 +1,43 @@
+Estado (Rx,Ry,Ro,Ra,Lista_palets,entorno)
+
+Clase palet(x,y,ori,obj_x):
+    self.pos_x
+    pos_y
+    self.orientacion
+
+    self.obj_x = pos_x
+    obj_y
+    obj_ori
+
+Moverse:
+    Sin palet
+        Evitar andar hacia pared o obstaculo, o por direccion larga palets
+
+    Con palet
+        Palet sentido vertical
+            No obstaculo en donde estara robot, o donde estara robot 1 arriba o 1 abajo
+        
+        Palet sentido horizontal
+            No obstaculo en donde estara robot, o donde estara robot 1 oeste, o 1 este
+
+Girar_izq
+    Sin palet
+        ->Girar robot izquierda
+
+    Con palet
+        Evitar girar si obstaculo a 1 radio robot, 2 alomejor con palets
+        -> Palet cambia orientacion
+        -> Girar robot izquierda
+
+
+Girar_der
+    Igual que arriba, diferente efecto para robot.
+
+
+Levantar:
+    Sin palet
+        Estar en posicion de un palet
+        -> Robot se pone levantado
+
+    Con pale
+        -> Se pone robot bajo
