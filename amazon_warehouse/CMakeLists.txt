@@ -18,7 +18,7 @@ find_package(catkin REQUIRED COMPONENTS
 find_package (gazebo REQUIRED)
 
 catkin_package(
-  INCLUDE_DIRS include
+  #INCLUDE_DIRS include
   CATKIN_DEPENDS gazebo_plugins gazebo_ros roscpp
 )
 
@@ -27,10 +27,10 @@ catkin_package(
 ## Build ##
 ###########
 
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS}")
 
 link_directories(${GAZEBO_LIBRARY_DIRS})
-include_directories(include)
+#include_directories(include)
 include_directories( ${catkin_INCLUDE_DIRS} 
                      ${Boost_INCLUDE_DIR} 
                      ${GAZEBO_INCLUDE_DIRS}
