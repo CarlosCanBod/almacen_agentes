@@ -1,0 +1,270 @@
+<?xml version="1.0" ?>
+
+<sdf version="1.5">
+	<world name="default">
+		<!-- A global light source -->
+        <gui>
+            <camera name="user_camera">
+                <pose>-5.5 2.0 17.0 0 1.417 0.0</pose>
+            </camera>
+        </gui>
+
+		<include>
+			<uri>model://sun</uri>
+		</include>
+
+		<!-- A ground plane -->
+		<include>
+			<uri>model://ground_plane</uri>
+		</include>
+        
+        <include>
+            <uri>model://amazon_warehouse_robot</uri>
+            <pose>-6 2 0 0 0 0</pose>
+        </include>
+
+        <!-- Obstacles -->
+
+        <include>
+            <uri>model://obstacle</uri>
+            <name>obstacle_0</name>
+            <pose>-4 2 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://obstacle</uri>
+            <name>obstacle_1</name>
+            <pose>-1 4 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://obstacle</uri>
+            <name>obstacle_2</name>
+            <pose>-1 3 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://obstacle</uri>
+            <name>obstacle_3</name>
+            <pose>-4 1 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://obstacle</uri>
+            <name>obstacle_4</name>
+            <pose>-4 0 0 0 0 1.57</pose>
+        </include>
+
+        <!-- Pallets left -->
+
+        <include>
+            <uri>model://amazon_warehouse_pallet</uri>
+            <name>warehouse_pallet_0</name>
+            <pose>-3 4 0 0 0 0</pose>
+        </include>
+
+        <!-- Behind robot -->
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_01</name>
+            <pose>-7 3.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_02</name>
+            <pose>-7 2.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_03</name>
+            <pose>-7 1.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_03b</name>
+            <pose>-7 0.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_04</name>
+            <pose>-6.5 0 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_05b</name>
+            <pose>-6.5 4.0 0 0 0 0</pose>
+        </include>
+
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_06</name>
+            <pose>-5.5 0 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_07</name>
+            <pose>-5.5 4.0 0 0 0 0</pose>
+        </include>     
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_08</name>
+            <pose>-5 4.5 0 0 0 1.57</pose>
+        </include>        
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_09</name>
+            <pose>-5 5.5 0 0 0 1.57</pose>
+        </include> 
+
+        
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_14</name>
+            <pose>-5 -0.5 0 0 0 1.57</pose>
+        </include>                                        
+
+        <!-- Front robot --> 
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_24</name>
+            <pose>-1 5.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_25</name>
+            <pose>-0.5 5 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_26</name>
+            <pose>0.5 5 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_27</name>
+            <pose>1.5 5 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_29</name>
+            <pose>2 4.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_30</name>
+            <pose>2 3.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_31</name>
+            <pose>2 2.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_32</name>
+            <pose>2 1.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_33</name>
+            <pose>2 0.5 0 0 0 1.57</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_36</name>
+            <pose>1.5 0.0 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_37</name>
+            <pose>0.5 0.0 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_38</name>
+            <pose>-0.5 0.0 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_39</name>
+            <pose>-1.0 -0.5 0 0 0 1.57</pose>
+        </include>
+
+        <!-- Right robot -->
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_46</name>
+            <pose>-1.5 -1 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_47</name>
+            <pose>-2.5 -1 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_48</name>
+            <pose>-3.5 -1 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_49</name>
+            <pose>-4.5 -1 0 0 0 0</pose>
+        </include>
+
+        <!-- Left robot -->
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_53</name>
+            <pose>-1.5 6 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_54</name>
+            <pose>-2.5 6 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_55</name>
+            <pose>-3.5 6 0 0 0 0</pose>
+        </include>
+
+        <include>
+            <uri>model://wall</uri>
+            <name>wall_56</name>
+            <pose>-4.5 6 0 0 0 0</pose>
+        </include>
+
+
+
+	</world>
+</sdf>
