@@ -74,6 +74,15 @@ class Busqueda():
         return None
     
 
+
+
+    def heuristica_1(self,estado_comprobar: Estado) -> int:
+
+        return 4
+
+
+
+
     def levantar_bajar(self, estado: Estado):
         """
         Tiene que estar debajo de un palet para poder usar esto,
@@ -219,7 +228,11 @@ class Busqueda():
         # Comprobar que robot puede moverse, si no devuelve None
         # Primero si sale fuera del entorno, y luego si en el entorno estatico la nueva posicion
         # esta ocupada por pared o obstaculo
-        if 0 > Rx_n > self.filas  or 0 > Ry_n > self.columnas or self.entorno[Rx_n][Ry_n]:
+        if 0 > Rx_n or Rx_n >= self.filas: 
+            return None
+        if 0 > Ry_n or Ry_n >= self.columnas: 
+            return None
+        if self.entorno[Rx_n][Ry_n]:
             return None
 
 
@@ -279,9 +292,9 @@ class Busqueda():
             if lleva_vertical == True:
 
                 # Que no choque con entorno el palet MIRAR SI ES REAL
-                if 0 > Rx_n > self.filas  or 0 > Ry_n + 1 > self.columnas or self.entorno[Rx_n][Ry_n+1]:
+                if 0 > Rx_n >= self.filas  or 0 > Ry_n + 1 >= self.columnas or self.entorno[Rx_n][Ry_n+1]:
                     return None
-                elif 0 > Rx_n > self.filas  or 0 > Ry_n - 1 > self.columnas or self.entorno[Rx_n][Ry_n-1]:
+                elif 0 > Rx_n >= self.filas  or 0 > Ry_n - 1 >= self.columnas or self.entorno[Rx_n][Ry_n-1]:
                     return None
 
 
@@ -405,7 +418,28 @@ class Busqueda():
         mapa = np.copy(entorno)
 
         if estado != None:
-            mapa[estado.Robot_x][estado.Robot_y] = ord(estado.Robot_orientacion)//10
+            mapa[estado.Robot_x][estado.Robot_y] =  2#ord(estado.Robot_orientacion)//10
+
+            for palet in estado.Lista_estanterias:
+                if palet.ang_actual == 1:
+                    mapa[palet.pos_x][palet.pos_y] = 6
+                    mapa[palet.pos_x][palet.pos_y+1] = 8
+                    mapa[palet.pos_x][palet.pos_y-1] = 8
+
+
+                else:
+                    mapa[palet.pos_x][palet.pos_y] = 9
+                    mapa[palet.pos_x+1][palet.pos_y] = 8        
+                    mapa[palet.pos_x-1][palet.pos_y] = 8
+
+
+
+                if palet.pos_x == estado.Robot_x and estado.Robot_y == palet.pos_y:
+                    if estado.Robot_activado:
+                        mapa[palet.pos_x][palet.pos_y] = 4
+                    else:
+                        mapa[palet.pos_x][palet.pos_y] = 3
+
 
         #print("robot x: ",estado.Robot_x)
         #print("robot y: ",estado.Robot_y)
@@ -419,15 +453,16 @@ class Busqueda():
 def main():
 
     entorno = [
+        [0, 0, 0, 0,1],
         [0, 0, 0, 0,0],
-        [1, 1, 0, 1,0],
         [0, 0, 0, 0,0],
-        [0, 1, 1, 0,0]
+        [0, 0, 0, 0,0]
     ]
 
-    situacion1 = Estado(0,0,"E",False,[])
+    paletillos = [Palet(1,1,True,1,1,False),Palet(2,3,False,3,3,False)]
+    situacion1 = Estado(0,0,"E",False,paletillos)
 
-    situacion_final = Estado(2,3,"N",False,[])
+    situacion_final = Estado(2,3,"E",False,paletillos)
 
     buscador = Busqueda(situacion1,situacion_final,entorno)
 
