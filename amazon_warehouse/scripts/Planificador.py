@@ -16,6 +16,11 @@ class Palet():
         return None
 
 
+    def __hash__(self) -> int:
+
+        return hash((self.pos_x,self.pos_y,self.ang_actual,self.x_objetivo,self.y_objetivo,self.ang_objetivo))
+
+
     def comprobar_lugar_deseado(self) -> bool:
         
         if self.pos_x != self.x_objetivo:
@@ -44,8 +49,18 @@ class Estado():
 
     def __eq__(self: "Estado", otro_estado: "Estado"):  # type: ignore
 
-        return False
+        return  hash(self) == hash(otro_estado)
                 
+
+    def __hash__(self) -> int:
+        
+        hash_palets = 0
+        for palet in self.Lista_estanterias:
+            hash_palets = hash(palet)
+
+
+        return hash((self.Robot_x,self.Robot_y,self.Robot_orientacion,self.Robot_activado,hash_palets))
+
 
 class Busqueda():
 
@@ -70,6 +85,10 @@ class Busqueda():
 
         self.entorno = entorno
 
+
+
+        self.lis_abierta: "list[Estado]" = [estado_inicial]
+        self.lis_cerrada: "list[Estado]" = []
 
         return None
     
@@ -363,53 +382,83 @@ class Busqueda():
         return Estado(Rx_n,Ry_n,Rang,R_levan,Lista_palets=lista_palets_nueva) #type:ignore
 
 
-    def expandir(self, estado_dado: Estado):
-
-        sucesores: "list[Estado]" =[]
-
-
-
-
-        # Añadir cuando puede avanzar
+    def expandir(self):
         """
-        Pendiente hacer que haga bastantes distancias,
-        hacer bucle  o algo asi.
+        Expande a partir del primer elemento de la lista abierta de estados.
+
+        
         
         """
-        estado_nuevo = self.avanzar(estado_dado)
-        if estado_nuevo != None:
-            sucesores.append(estado_nuevo)
+
+        ciclos = 0
+        profundidad = 100
+        Exito = False
+
+        while len(self.lis_abierta) > 0 and (profundidad >= ciclos) and Exito == False:
+
+            repetido:bool = False
+            sucesores: "list[Estado]" =[]
+
+            estado_sacado: Estado = self.lis_abierta.pop(0)
+
+            print("Profundidad: ",ciclos)
+            ciclos = ciclos+1
+            if estado_sacado not in self.lis_cerrada:
+                print("Nuevo")
+                self.lis_cerrada.append(estado_sacado)
+
+                if estado_sacado == self.estado_final:
+                    Exito = True
+                    print("Llegado al final")
+                    self.imprimir(estado_sacado,self.entorno)
 
 
+            else:
+                print("Repetido")
+                repetido:bool = True
 
-        # Cuando puede girar izq
-        estado_nuevo = self.girar_izq(estado=estado_dado)
-        if estado_nuevo != None:
-            sucesores.append(estado_nuevo)
+            if repetido == False:
+                # Añadir cuando puede avanzar
+                """
+                Pendiente hacer que haga bastantes distancias,
+                hacer bucle  o algo asi.
+                
+                """
+                estado_nuevo = self.avanzar(estado_sacado)
+                if estado_nuevo != None:
+                    sucesores.append(estado_nuevo)
 
-        # Cuando puede girar der
-        estado_nuevo = self.girar_der(estado=estado_dado)
-        if estado_nuevo != None:
-            sucesores.append(estado_nuevo)
+                # Cuando puede girar izq
+                estado_nuevo = self.girar_izq(estado=estado_sacado)
+                if estado_nuevo != None:
+                    sucesores.append(estado_nuevo)
 
-
-        # levantar o bajar palet
-        estado_nuevo = self.levantar_bajar(estado=estado_dado)
-        if estado_nuevo != None:
-            sucesores.append(estado_nuevo)
-
-
-        # Imprimir los sucesores generados
-        print("Num estados: ", len(sucesores)); print(sucesores)
-        for s in sucesores:
-            if s != None:
-                print("Estado:")
-                self.imprimir(s,self.entorno)
-
-
+                # Cuando puede girar der
+                estado_nuevo = self.girar_der(estado=estado_sacado)
+                if estado_nuevo != None:
+                    sucesores.append(estado_nuevo)
 
 
-        return sucesores
+                # levantar o bajar palet
+                estado_nuevo = self.levantar_bajar(estado=estado_sacado)
+                if estado_nuevo != None:
+                    sucesores.append(estado_nuevo)
+
+
+            
+            # Imprimir los sucesores generados
+            #print("Num estados: ", len(sucesores)); print(sucesores)
+            for s in sucesores:
+                if s != None:
+                    #print("Estado:")
+                    #self.imprimir(s,self.entorno)
+                    self.lis_abierta.append(s)
+
+            
+            repetido:bool = False
+
+
+        return None
 
 
     def imprimir(self,estado: Estado ,entorno) -> None:
@@ -454,20 +503,25 @@ def main():
 
     entorno = [
         [0, 0, 0, 0,1],
-        [0, 0, 0, 0,0],
+        [1, 0, 0, 0,0],
         [0, 0, 0, 0,0],
         [0, 0, 0, 0,0]
     ]
 
-    paletillos = [Palet(1,1,True,1,1,False),Palet(2,3,False,3,3,False)]
+    paletillos = []#[Palet(1,1,True,1,1,False),Palet(2,3,False,3,3,False)]
     situacion1 = Estado(0,0,"E",False,paletillos)
+    situacion2 = Estado(0,0,"E",False,paletillos)
 
     situacion_final = Estado(2,3,"E",False,paletillos)
 
     buscador = Busqueda(situacion1,situacion_final,entorno)
 
 
-    buscador.expandir(situacion1)
+    buscador.expandir()
+    #print(situacion1==situacion2)
+
+    #print(situacion1==situacion_final)
+
 
     return None
 
