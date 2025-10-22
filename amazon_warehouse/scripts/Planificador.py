@@ -55,8 +55,9 @@ class Estado():
     def __hash__(self) -> int:
         
         hash_palets = 0
-        for palet in self.Lista_estanterias:
-            hash_palets = hash(palet)
+        if self.Lista_estanterias != None:
+            for palet in self.Lista_estanterias:
+                hash_palets = hash(palet)
 
 
         return hash((self.Robot_x,self.Robot_y,self.Robot_orientacion,self.Robot_activado,hash_palets))
@@ -243,6 +244,7 @@ class Busqueda():
         Rx_n = estado.Robot_x + dx
         Ry_n = estado.Robot_y + dy
 
+        lista_palets_nueva = []
 
         # Comprobar que robot puede moverse, si no devuelve None
         # Primero si sale fuera del entorno, y luego si en el entorno estatico la nueva posicion
@@ -277,12 +279,23 @@ class Busqueda():
 
         # Si el robot está levantado tiene estanteria, por lo que  hay que hacer más comprobaciones.
         else:    # Si no lleva palet
+
+
+            if estado.Lista_estanterias == None:
+                print("Error, palet desaparecio")
+
+                self.imprimir(estado,self.entorno)
+                return None
+
+
+
+
             lleva_vertical: bool = False
             
             # Aqui se meten los palets que no se mueven, 
             # para despues no comparar el que se mueve consigo mismo
             lista_palets_quietos: "list[Palet] " = []   
-
+            Palet_movido = None     #type:ignore
 
             # Buscar que palet es el que lleva el robot y mover su posicion a que este
             # encima del robot
@@ -375,14 +388,16 @@ class Busqueda():
 
 
             #PENDIENTE DE SI LLEVA EL PALET EN HORIZONTAL
+            if Palet_movido != None:
+                lista_palets_nueva = lista_palets_quietos.append(Palet_movido)  # type: ignore
 
-            lista_palets_nueva = lista_palets_quietos.append(Palet_movido)  # type: ignore
 
-
+    
         return Estado(Rx_n,Ry_n,Rang,R_levan,Lista_palets=lista_palets_nueva) #type:ignore
+    
 
 
-    def expandir(self):
+    def expandir(self,profundidad= 100):
         """
         Expande a partir del primer elemento de la lista abierta de estados.
 
@@ -391,7 +406,6 @@ class Busqueda():
         """
 
         ciclos = 0
-        profundidad = 100
         Exito = False
 
         while len(self.lis_abierta) > 0 and (profundidad >= ciclos) and Exito == False:
@@ -400,6 +414,13 @@ class Busqueda():
             sucesores: "list[Estado]" =[]
 
             estado_sacado: Estado = self.lis_abierta.pop(0)
+
+
+            # Hacer aqui comprobaciones de que el que se saca existe.
+
+
+
+
 
             print("Profundidad: ",ciclos)
             ciclos = ciclos+1
@@ -448,16 +469,21 @@ class Busqueda():
             
             # Imprimir los sucesores generados
             #print("Num estados: ", len(sucesores)); print(sucesores)
-            for s in sucesores:
-                if s != None:
-                    #print("Estado:")
-                    #self.imprimir(s,self.entorno)
-                    self.lis_abierta.append(s)
+            if Exito == False:
+                for s in sucesores:
+                    if s != None :
+                        print("Estado:")
+                        self.imprimir(s,self.entorno)
+                        self.lis_abierta.append(s)
 
             
             repetido:bool = False
 
 
+        if len(self.lis_abierta) == 0:
+            print("Error, no se encontro solucion")
+
+        print("Exito: ", Exito)
         return None
 
 
@@ -469,25 +495,26 @@ class Busqueda():
         if estado != None:
             mapa[estado.Robot_x][estado.Robot_y] =  2#ord(estado.Robot_orientacion)//10
 
-            for palet in estado.Lista_estanterias:
-                if palet.ang_actual == 1:
-                    mapa[palet.pos_x][palet.pos_y] = 6
-                    mapa[palet.pos_x][palet.pos_y+1] = 8
-                    mapa[palet.pos_x][palet.pos_y-1] = 8
+            if estado.Lista_estanterias != None:
+                for palet in estado.Lista_estanterias:
+                    if palet.ang_actual == 1:
+                        mapa[palet.pos_x][palet.pos_y] = 6
+                        mapa[palet.pos_x][palet.pos_y+1] = 8
+                        mapa[palet.pos_x][palet.pos_y-1] = 8
 
 
-                else:
-                    mapa[palet.pos_x][palet.pos_y] = 9
-                    mapa[palet.pos_x+1][palet.pos_y] = 8        
-                    mapa[palet.pos_x-1][palet.pos_y] = 8
-
-
-
-                if palet.pos_x == estado.Robot_x and estado.Robot_y == palet.pos_y:
-                    if estado.Robot_activado:
-                        mapa[palet.pos_x][palet.pos_y] = 4
                     else:
-                        mapa[palet.pos_x][palet.pos_y] = 3
+                        mapa[palet.pos_x][palet.pos_y] = 9
+                        mapa[palet.pos_x+1][palet.pos_y] = 8        
+                        mapa[palet.pos_x-1][palet.pos_y] = 8
+
+
+
+                    if palet.pos_x == estado.Robot_x and estado.Robot_y == palet.pos_y:
+                        if estado.Robot_activado:
+                            mapa[palet.pos_x][palet.pos_y] = 4
+                        else:
+                            mapa[palet.pos_x][palet.pos_y] = 3
 
 
         #print("robot x: ",estado.Robot_x)
@@ -503,24 +530,28 @@ def main():
 
     entorno = [
         [0, 0, 0, 0,1],
-        [1, 0, 0, 0,0],
+        [0, 0, 0, 0,0],
         [0, 0, 0, 0,0],
         [0, 0, 0, 0,0]
     ]
 
-    paletillos = []#[Palet(1,1,True,1,1,False),Palet(2,3,False,3,3,False)]
+    paletillos = [Palet(1,1,True,1,1,False)]
+    paletillos_obj = [Palet(1,1,True,1,1,False)]  # Borrar cuando se haga a*, utilizar distancia actual a deseada como valor h(n)
+
     situacion1 = Estado(0,0,"E",False,paletillos)
     situacion2 = Estado(0,0,"E",False,paletillos)
 
-    situacion_final = Estado(2,3,"E",False,paletillos)
+    situacion_final = Estado(2,4,"E",False,paletillos_obj)
+
+    print(situacion1==situacion_final)
+
 
     buscador = Busqueda(situacion1,situacion_final,entorno)
 
 
-    buscador.expandir()
+    buscador.expandir(profundidad=10000)
     #print(situacion1==situacion2)
 
-    #print(situacion1==situacion_final)
 
 
     return None
