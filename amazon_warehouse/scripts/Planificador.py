@@ -61,7 +61,7 @@ class Estado():
         hash_palets = 0
         if self.Lista_estanterias != None:
             for palet in self.Lista_estanterias:
-                hash_palets = hash(palet)
+                hash_palets = hash(palet) + hash_palets
 
 
         return hash((self.Robot_x,self.Robot_y,self.Robot_orientacion,self.Robot_activado,hash_palets))
