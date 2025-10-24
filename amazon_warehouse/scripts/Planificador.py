@@ -93,12 +93,45 @@ class Busqueda():
 
         return None
     
+    def heuristica_robot_origen(self,robot_x,robot_y,robot_orientacion)-> int:
+        coste = abs(robot_x+robot_y)
+
+        if robot_orientacion != self.estado_ini.Robot_orientacion:
+            coste = coste + 1
+
+        return coste
 
 
+    def heuristica_palets1(self,lista_palets: "list[Palet]") -> int:
 
-    def heuristica_1(self,estado_comprobar: Estado) -> int:
+        coste = 0
 
-        return 4
+        if lista_palets != None:
+            for palet in lista_palets:
+
+                c1 = (palet.x_objetivo-palet.pos_x)**2 + (palet.y_objetivo-palet.pos_y)**2
+
+                if palet.ang_actual != palet.ang_objetivo:
+                    c1 = c1 +1
+
+
+                coste = coste + c1
+
+
+        return coste
+
+
+    def heuristica_total(self,estado_comprobar: Estado,coste_previo:int = 0) -> int:
+        coste_total = coste_previo
+        
+        lista_palets = estado_comprobar.Lista_estanterias
+        
+        coste_total = self.heuristica_robot_origen(estado_comprobar.Robot_x,estado_comprobar.Robot_y,
+                                              estado_comprobar.Robot_orientacion)
+
+        coste_total: int = self.heuristica_palets1(lista_palets)  + coste_total
+
+        return coste_total
 
 
 
@@ -152,6 +185,7 @@ class Busqueda():
             return estado_nuevo
 
         else: 
+            robot_angulo = self.rotar_izquierda[robot_angulo]
 
             # Si lleva palet hay que hacer mas comprobaciones
             # Que no este cerca de algun obstaculo o pared
@@ -193,11 +227,10 @@ class Busqueda():
         rob_activado: bool = estado.Robot_activado
         lis_estanterias: "list[Palet]" = estado.Lista_estanterias.copy()
 
+        robot_angulo = self.rotar_derecha[robot_angulo]
 
 
         if rob_activado == 0:
-            robot_angulo = self.rotar_derecha[robot_angulo]
-
 
             estado_nuevo: Estado = Estado(cord_robot_x,cord_robot_y,robot_angulo,rob_activado,lis_estanterias)
 
@@ -205,7 +238,6 @@ class Busqueda():
 
         else: 
             # Si lleva palet hay que hacer mas comprobaciones
-            
 
             # Que no este cerca de algun obstaculo o pared
             for ancho in range(-1,1):
@@ -428,7 +460,7 @@ class Busqueda():
                 print("Nuevo")
                 self.lis_cerrada.append(estado_sacado)
 
-                if estado_sacado == self.estado_final:
+                if estado_sacado == self.estado_final or self.heuristica_total(estado_sacado) == 0:
                     Exito = True
                     print("Llegado al final")
                     self.imprimir(estado_sacado,self.entorno)
@@ -472,7 +504,7 @@ class Busqueda():
             if Exito == False:
                 for s in sucesores:
                     if s != None :
-                        print("Estado:")
+                        print("Estado coste:", self.heuristica_total(s,0))
                         self.imprimir(s,self.entorno)
                         self.lis_abierta.append(s)
 
@@ -480,12 +512,13 @@ class Busqueda():
             repetido:bool = False
 
 
-        if len(self.lis_abierta) == 0:
+        if len(self.lis_abierta)== 0 and Exito == False:
             print("Error, no se encontro solucion")
 
         print("Exito: ", Exito)
         return None
 
+          
 
     def imprimir(self,estado: Estado ,entorno) -> None:
         
@@ -541,7 +574,7 @@ def main():
     situacion1 = Estado(0,0,"E",False,paletillos)
     situacion2 = Estado(0,0,"E",False,paletillos)
 
-    situacion_final = Estado(2,4,"E",False,paletillos_obj)
+    situacion_final = Estado(0,0,"E",False,paletillos_obj)
 
     print(situacion1==situacion_final)
 
