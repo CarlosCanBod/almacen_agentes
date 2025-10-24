@@ -124,17 +124,44 @@ class Busqueda():
 
         return coste
 
+    def heur_robot_palet(self,estado_comprobar: Estado):
+
+        coste = 0
+        x1 = estado_comprobar.Robot_pos_x
+        y1 = estado_comprobar.Robot_pos_y
+
+        lista_palets: "list[Palet]" = estado_comprobar.Lista_estanterias
+        
+        for palet in lista_palets:
+            x2 = palet.pos_x
+            y2 = palet.pos_y
+            x3= palet.x_objetivo
+            y3 = palet.y_objetivo
+            
+            if x2 != x3 or y2 != y3:
+                dist = (x2-x1)**2 + (y2-y1)**2
+                coste = coste + dist
+            
+        return coste
+
+
+
+    
 
     def heuristica_total(self,estado_comprobar: Estado,coste_previo:int = 0) -> int:
         coste_total = coste_previo
         
         lista_palets = estado_comprobar.Lista_estanterias
+
+
         
         coste_total = self.heuristica_robot_origen(estado_comprobar.Robot_x,estado_comprobar.Robot_y,
                                               estado_comprobar.Robot_orientacion)
 
         coste_total: int = self.heuristica_palets1(lista_palets)  + coste_total
 
+        coste_total = self.heur_robot_palet(lista_palets) + coste_total
+        
         return coste_total
 
 
