@@ -1,6 +1,4 @@
-#Clase para el ejercicio 8
-#8. Implementar el TAD Colas de Prioridad, usando listas enlazadas ordenadas
-
+from typing import Any
 
 #Cada elemento/nodo de la lista enlazada 
 #tiene un dato, el nodo siguiente y una prioridad
@@ -8,7 +6,7 @@
 #se va a introducir el que mas prioridad tenga adelante
 class nodo_cola_prioridad():
     def __init__(self,dato = 0,prioridad = 1):
-        self.dato = dato
+        self.dato: Any = dato
         self.siguiente = None
         self.prioridad = prioridad #Se considera que cuanto mas alto mas importante :)
 
@@ -37,7 +35,7 @@ class cola_prio():
         except:
             print("error al convertir lista en string")
 
-            return None
+            return "Error imprimir cola prioridad"
 
     #Introduce el elemento en la lista y su posicion depende de su prioridad
     #Cuanta mas prioridad mas a la derecha se va a colocar. 
@@ -47,11 +45,11 @@ class cola_prio():
             #al principio. 
             if self.cabeza == None:
                 self.cabeza = nodo_cola_prioridad(dato,prioridad)
-
+                print("Se crea cabeza")
 
             #Si el elemento que se va a meter tiene menos prioridad
             #que el primero, el nuevo va a ser la nueva cabeza(el primero de la cola)
-            elif self.cabeza.prioridad >= prioridad: 
+            elif self.cabeza.prioridad <= prioridad: 
                     nodo_nuevo = nodo_cola_prioridad(dato, prioridad) 
                     
                 
@@ -73,7 +71,7 @@ class cola_prio():
                 while (nodo_actual != None) and (fin == False): 
                     #Si el nodo actual tiene mas prioridad
                     #que el que se va a meter sale del bucle 
-                    if nodo_actual.prioridad >= prioridad:
+                    if nodo_actual.prioridad <= prioridad:
                         fin = True
                     else: 
                         nodo_previo = nodo_actual
@@ -97,7 +95,7 @@ class cola_prio():
     #Borra el elemento mas a la derecha
     def pop(self):
         try:
-            if self.vacio() == False:
+            if self.cabeza != None:
                 nodo_actual = self.cabeza
                 nodo_previo = None
 
@@ -114,12 +112,13 @@ class cola_prio():
     #Devuelve cual es el elemento con mas prioridad(mas a la derecha)
     #Pero no lo borra    
     def primero(self):
-        if self.vacio() == False:
+        if self.cabeza != None:
             nodo_actual = self.cabeza
-            while nodo_actual.siguiente != None:
-                nodo_actual = nodo_actual.siguiente
+            if nodo_actual.siguiente != None:
+                while nodo_actual.siguiente != None:
+                    nodo_actual = nodo_actual.siguiente
 
-            return nodo_actual
+                return nodo_actual
         else:
             pass
 
@@ -131,7 +130,8 @@ class cola_prio():
     #Devuelve el tamano de la cola
     #Recorriendo la cola y contando
     def tamano(self):
-        if self.vacio() == False:
+        
+        if self.cabeza != None:
             nodo_actual = self.cabeza
             tamano = 0;
             while nodo_actual.siguiente != None:
@@ -141,19 +141,34 @@ class cola_prio():
             tamano += 1
             return tamano
         else:
-            return tamano
+            return 0
         
+
+
+    def __len__(self):
+        if self.cabeza != None:
+            nodo_actual = self.cabeza
+            tamano = 0;
+            while nodo_actual.siguiente != None:
+                nodo_actual = nodo_actual.siguiente
+                tamano += 1
+
+            tamano += 1
+            return tamano
+        else:
+            return 0
 
     #Devuelve el elemento con mas prioridad y lo borra de la cola
     def extraer(self):
-        if self.vacio() == False:
+        if self.cabeza != None:
             nodo_actual = self.cabeza
             nodo_previo = None
-            while nodo_actual.siguiente != None:
-                nodo_previo = nodo_actual
-                nodo_actual = nodo_actual.siguiente
+            if nodo_actual.siguiente != None:
+                while nodo_actual.siguiente != None:
+                    nodo_previo = nodo_actual
+                    nodo_actual = nodo_actual.siguiente
 
-            nodo_previo.siguiente = None #Asi el nodo que se devuelve ya no tiene quien lo referencie
+                nodo_previo.siguiente = None #Asi el nodo que se devuelve ya no tiene quien lo referencie
 
 
             return nodo_actual
