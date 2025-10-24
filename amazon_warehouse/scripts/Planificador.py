@@ -15,6 +15,10 @@ class Palet():
 
         return None
 
+    def __str__(self) -> str:
+        
+        return "X: " + str(self.pos_x)
+
 
     def __hash__(self) -> int:
 
@@ -57,7 +61,7 @@ class Estado():
         hash_palets = 0
         if self.Lista_estanterias != None:
             for palet in self.Lista_estanterias:
-                hash_palets = hash(palet)
+                hash_palets = hash(palet) + hash_palets
 
 
         return hash((self.Robot_x,self.Robot_y,self.Robot_orientacion,self.Robot_activado,hash_palets))
@@ -120,17 +124,44 @@ class Busqueda():
 
         return coste
 
+    def heur_robot_palet(self,estado_comprobar: Estado):
+
+        coste = 0
+        x1 = estado_comprobar.Robot_pos_x
+        y1 = estado_comprobar.Robot_pos_y
+
+        lista_palets: "list[Palet]" = estado_comprobar.Lista_estanterias
+        
+        for palet in lista_palets:
+            x2 = palet.pos_x
+            y2 = palet.pos_y
+            x3= palet.x_objetivo
+            y3 = palet.y_objetivo
+            
+            if x2 != x3 or y2 != y3:
+                dist = (x2-x1)**2 + (y2-y1)**2
+                coste = coste + dist
+            
+        return coste
+
+
+
+    
 
     def heuristica_total(self,estado_comprobar: Estado,coste_previo:int = 0) -> int:
         coste_total = coste_previo
         
         lista_palets = estado_comprobar.Lista_estanterias
+
+
         
         coste_total = self.heuristica_robot_origen(estado_comprobar.Robot_x,estado_comprobar.Robot_y,
                                               estado_comprobar.Robot_orientacion)
 
         coste_total: int = self.heuristica_palets1(lista_palets)  + coste_total
 
+        coste_total = self.heur_robot_palet(lista_palets) + coste_total
+        
         return coste_total
 
 
@@ -268,15 +299,21 @@ class Busqueda():
 
     def avanzar(self, estado: Estado) -> Any:
 
-        # Mira a que posicion cambia el robot si avanza, mirando la orientacion
+        Rob_pos_x = estado.Robot_x
+        Rob_pos_y= estado.Robot_y
         Rang = estado.Robot_orientacion
-        dx, dy = self.movimientos[estado.Robot_orientacion]
+        R_levan = estado.Robot_activado
+
+
+
+        # Mira a que posicion cambia el robot si avanza, mirando la orientacion
+        dx, dy = self.movimientos[Rang]
 
         # nueva posicion del robot
-        Rx_n = estado.Robot_x + dx
-        Ry_n = estado.Robot_y + dy
+        Rx_n = Rob_pos_x + dx
+        Ry_n = Rob_pos_y + dy
 
-        lista_palets_nueva = []
+        lista_palets_copia = estado.Lista_estanterias.copy()
 
         # Comprobar que robot puede moverse, si no devuelve None
         # Primero si sale fuera del entorno, y luego si en el entorno estatico la nueva posicion
@@ -290,11 +327,10 @@ class Busqueda():
 
 
         # El robot no baja o sube el palet aqui, queda igual
-        R_levan = estado.Robot_activado
 
         if R_levan == False:
             # Comprobar que el robot no choca con patas de alguna estanteria
-            for palet in estado.Lista_estanterias:
+            for palet in lista_palets_copia:
                 if palet.ang_actual == 1: # Si el palet esta en vertical
                     # Al estar en vertical el robot no se puede mover 1 encima o debajo
                     # de la posicion del palet
@@ -306,18 +342,17 @@ class Busqueda():
                     if palet.pos_y == Ry_n and (palet.pos_x +1 == (Rx_n) or palet.pos_x -1  == Rx_n):
                         return None
 
-            lista_palets_nueva = estado.Lista_estanterias.copy()
-
+            lista_palets_nueva = lista_palets_copia
 
         # Si el robot está levantado tiene estanteria, por lo que  hay que hacer más comprobaciones.
         else:    # Si no lleva palet
 
 
-            if estado.Lista_estanterias == None:
+            if lista_palets_copia == None:
                 print("Error, palet desaparecio")
 
                 self.imprimir(estado,self.entorno)
-                return None
+                exit()
 
 
 
@@ -331,10 +366,16 @@ class Busqueda():
 
             # Buscar que palet es el que lleva el robot y mover su posicion a que este
             # encima del robot
-            for palet in estado.Lista_estanterias:
+            for palet in lista_palets_copia:
                 if palet.pos_x == estado.Robot_x and palet.pos_y == estado.Robot_y:
 
-                    Palet_movido: Palet = palet
+                    Pal_pos_x = palet.pos_x; Pal_obj_x = palet.x_objetivo
+                    Pal_pos_y = palet.pos_y; Pal_obj_y = palet.y_objetivo
+                    Pal_ang_act = palet.ang_actual; Pal_obj_ang = palet.ang_objetivo
+                    
+
+                    Palet_movido: Palet = Palet(Pal_pos_x,Pal_pos_y,Pal_ang_act,
+                                                Pal_obj_x,Pal_obj_y,Pal_obj_ang)
 
                     Palet_movido.pos_x = Palet_movido.pos_x + dx
                     Palet_movido.pos_y = Palet_movido.pos_y + dy
@@ -342,6 +383,7 @@ class Busqueda():
                     if Palet_movido.ang_actual == True:    # Si es vertical el palet que lleva
                         lleva_vertical: bool = True
                     else:
+
                         lleva_vertical: bool = False
 
                 else:
@@ -366,6 +408,7 @@ class Busqueda():
 
                     # Que no se meta en otro palet
                     if Rx_n == palet.pos_x and Ry_n == palet.pos_y:
+                        print("Choque 1")
                         return None
 
 
@@ -375,6 +418,8 @@ class Busqueda():
                         # de la posicion del palet
                         # PENDIENTE
                         if palet.pos_x == Rx_n and (palet.pos_y-1 == (Ry_n) or palet.pos_y == (Ry_n) or palet.pos_y+1 == (Ry_n)):
+                            print("Choque 2")
+
                             return None
                         
                     else:
@@ -382,6 +427,7 @@ class Busqueda():
                         for ancho in range(-1,1):
                             for alto in range(-1,1):
                                 if Rx_n == palet.pos_x +ancho and Ry_n == palet.pos_y + alto:
+                                    print("Choque 3")
                                     return None
             else:
                 # Si lo lleva en horizontal
@@ -419,13 +465,18 @@ class Busqueda():
                 
 
 
-            #PENDIENTE DE SI LLEVA EL PALET EN HORIZONTAL
+            lista_palets_nueva = lista_palets_quietos
             if Palet_movido != None:
-                lista_palets_nueva = lista_palets_quietos.append(Palet_movido)  # type: ignore
+                
+                lista_palets_nueva.append(Palet_movido)
 
 
-    
-        return Estado(Rx_n,Ry_n,Rang,R_levan,Lista_palets=lista_palets_nueva) #type:ignore
+                #print("Se devuelve: ", type(lista_palets_nueva)) 
+                #self.imprimir(Estado(Rx_n,Ry_n,Rang,R_levan,Lista_palets=lista_palets_nueva) ,self.entorno)
+                #print("Fin devolver")
+
+
+        return Estado(Rx_n,Ry_n,Rang,R_levan,Lista_palets=lista_palets_nueva) 
     
 
 
@@ -436,86 +487,48 @@ class Busqueda():
         
         
         """
-
-        ciclos = 0
-        Exito = False
-
-        while len(self.lis_abierta) > 0 and (profundidad >= ciclos) and Exito == False:
-
-            repetido:bool = False
-            sucesores: "list[Estado]" =[]
-
-            estado_sacado: Estado = self.lis_abierta.pop(0)
-
-
-            # Hacer aqui comprobaciones de que el que se saca existe.
+        est_ini = self.estado_ini
+        print("Estado coste original:", self.heuristica_total(est_ini,0))
 
 
 
+        estado_nuevo = self.avanzar(est_ini)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste1:", self.heuristica_total(estado_nuevo,0))
+      
+
+        estado_nuevo = self.girar_izq(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste2:", self.heuristica_total(estado_nuevo,0))
+        
+
+        estado_nuevo = self.avanzar(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste3:", self.heuristica_total(estado_nuevo,0))
+
+        estado_nuevo = self.levantar_bajar(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste4:", self.heuristica_total(estado_nuevo,0))
+
+        estado_nuevo = self.avanzar(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste5:", self.heuristica_total(estado_nuevo,0))
 
 
-            print("Profundidad: ",ciclos)
-            ciclos = ciclos+1
-            if estado_sacado not in self.lis_cerrada:
-                print("Nuevo")
-                self.lis_cerrada.append(estado_sacado)
+        estado_nuevo = self.girar_der(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste5:", self.heuristica_total(estado_nuevo,0))
 
-                if estado_sacado == self.estado_final or self.heuristica_total(estado_sacado) == 0:
-                    Exito = True
-                    print("Llegado al final")
-                    self.imprimir(estado_sacado,self.entorno)
+        estado_nuevo = self.avanzar(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste5:", self.heuristica_total(estado_nuevo,0))
+        estado_nuevo = self.levantar_bajar(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste4:", self.heuristica_total(estado_nuevo,0))
+        estado_nuevo = self.avanzar(estado_nuevo)
+        self.imprimir(estado_nuevo,self.entorno)
+        print("Estado coste5:", self.heuristica_total(estado_nuevo,0))
 
-
-            else:
-                print("Repetido")
-                repetido:bool = True
-
-            if repetido == False:
-                # Añadir cuando puede avanzar
-                """
-                Pendiente hacer que haga bastantes distancias,
-                hacer bucle  o algo asi.
-                
-                """
-                estado_nuevo = self.avanzar(estado_sacado)
-                if estado_nuevo != None:
-                    sucesores.append(estado_nuevo)
-
-                # Cuando puede girar izq
-                estado_nuevo = self.girar_izq(estado=estado_sacado)
-                if estado_nuevo != None:
-                    sucesores.append(estado_nuevo)
-
-                # Cuando puede girar der
-                estado_nuevo = self.girar_der(estado=estado_sacado)
-                if estado_nuevo != None:
-                    sucesores.append(estado_nuevo)
-
-
-                # levantar o bajar palet
-                estado_nuevo = self.levantar_bajar(estado=estado_sacado)
-                if estado_nuevo != None:
-                    sucesores.append(estado_nuevo)
-
-
-            
-            # Imprimir los sucesores generados
-            #print("Num estados: ", len(sucesores)); print(sucesores)
-            if Exito == False:
-                for s in sucesores:
-                    if s != None :
-                        print("Estado coste:", self.heuristica_total(s,0))
-                        self.imprimir(s,self.entorno)
-                        self.lis_abierta.append(s)
-
-            
-            repetido:bool = False
-
-
-        if len(self.lis_abierta)== 0 and Exito == False:
-            print("Error, no se encontro solucion")
-
-        print("Exito: ", Exito)
         return None
 
           
@@ -572,7 +585,6 @@ def main():
     paletillos_obj = [Palet(1,1,True,1,1,False)]  # Borrar cuando se haga a*, utilizar distancia actual a deseada como valor h(n)
 
     situacion1 = Estado(0,0,"E",False,paletillos)
-    situacion2 = Estado(0,0,"E",False,paletillos)
 
     situacion_final = Estado(0,0,"E",False,paletillos_obj)
 
