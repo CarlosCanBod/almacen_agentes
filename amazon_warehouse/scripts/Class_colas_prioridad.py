@@ -16,6 +16,16 @@ class nodo_cola_prioridad():
         return cadena
 
 
+    def __eq__(self, otro: object) -> bool:
+        
+        return hash(self) == hash(otro)
+
+
+    def __hash__(self) -> int:
+
+        return hash((self.dato,self.prioridad))
+
+
 #Aqui se crea la cola de prioridad ordenada
 #Los nodos/elementos se van a ordenar de menor a mayor prioridad
 class cola_prio():
@@ -39,22 +49,20 @@ class cola_prio():
 
     #Introduce el elemento en la lista y su posicion depende de su prioridad
     #Cuanta mas prioridad mas a la derecha se va a colocar. 
-    def insertar(self,dato,prioridad):
+    def insertar(self,dato: Any,prioridad: int):
         try:
             #Si la cola esta vacia se introduce el nodo/elemento
             #al principio. 
             if self.cabeza == None:
                 self.cabeza = nodo_cola_prioridad(dato,prioridad)
-                print("Se crea cabeza")
+                
 
             #Si el elemento que se va a meter tiene menos prioridad
             #que el primero, el nuevo va a ser la nueva cabeza(el primero de la cola)
             elif self.cabeza.prioridad <= prioridad: 
                     nodo_nuevo = nodo_cola_prioridad(dato, prioridad) 
                     
-                
-                    nodo_nuevo.siguiente = self.cabeza 
-                    
+                    nodo_nuevo.siguiente = self.cabeza      #type: ignore
                     self.cabeza = nodo_nuevo 
 
 
@@ -82,8 +90,9 @@ class cola_prio():
                 #el que esta despues del auxiliar, y se pone delante del auxiliar 
                 #el nuevo elemento, por lo que si hay empate el nuevo se queda atras
                 nodo_nuevo = nodo_cola_prioridad(dato,prioridad)
-                nodo_nuevo.siguiente = nodo_actual
-                nodo_previo.siguiente = nodo_nuevo  
+                nodo_nuevo.siguiente = nodo_actual  #type: ignore
+                nodo_previo.siguiente = nodo_nuevo  # type: ignore
+
         except:
             print("Error al introducir elemento en la lista")
 
@@ -104,8 +113,10 @@ class cola_prio():
                     nodo_previo = nodo_actual
                     nodo_actual = nodo_actual.siguiente
 
+                if nodo_previo != None:
+                    nodo_previo.siguiente = None
+            
 
-                nodo_previo.siguiente = None
         except:
             print("Error en pop lista prioridad")    
 
@@ -157,6 +168,8 @@ class cola_prio():
             return tamano
         else:
             return 0
+   
+
 
     #Devuelve el elemento con mas prioridad y lo borra de la cola
     def extraer(self):
@@ -168,7 +181,8 @@ class cola_prio():
                     nodo_previo = nodo_actual
                     nodo_actual = nodo_actual.siguiente
 
-                nodo_previo.siguiente = None #Asi el nodo que se devuelve ya no tiene quien lo referencie
+                if nodo_previo != None:
+                    nodo_previo.siguiente = None #Asi el nodo que se devuelve ya no tiene quien lo referencie
 
 
             return nodo_actual
