@@ -110,7 +110,9 @@ class Busqueda():
         return coste
 
 
-    def heuristica_palets1(self,lista_palets: "list[Palet]") -> int:
+    def heuristica_palets1(self,estado_comprobar: Estado) -> int:
+
+        lista_palets: "list[Palet]" = estado_comprobar.Lista_estanterias
 
         coste = 0
 
@@ -120,9 +122,9 @@ class Busqueda():
                 c1 = abs(palet.x_objetivo-palet.pos_x) + abs(palet.y_objetivo-palet.pos_y)
 
 
-                if palet.ang_actual != palet.ang_objetivo:
-                    c1 = c1 + 1
-
+                if palet.x_objetivo==palet.pos_x and palet.y_objetivo==palet.pos_y:
+                    if palet.ang_actual != palet.ang_objetivo:
+                        c1 = c1 + 1
 
                 coste = coste + c1
 
@@ -144,7 +146,7 @@ class Busqueda():
             y3 = palet.y_objetivo
             
             if x2 != x3 or y2 != y3:
-                dist = (x2-x1)**2 + (y2-y1)**2
+                dist = abs(x2-x1) + abs(y2-y1)
                 coste = coste + dist
             
         return coste
@@ -155,18 +157,19 @@ class Busqueda():
 
     def heuristica_total(self,estado_comprobar: Estado) -> int:
         
-        lista_palets = estado_comprobar.Lista_estanterias
+        
         coste_robot_origen = 0
-    
+        coste_palets_robot = 0
+
         #coste_robot_origen = self.heuristica_robot_origen(estado_comprobar.Robot_x,estado_comprobar.Robot_y, estado_comprobar.Robot_orientacion,estado_comprobar.Robot_activado)
         coste_palets_objetivo = 0
 
-        if len(lista_palets):
-            coste_palets_objetivo: int = (self.heuristica_palets1(lista_palets))
+        if len(estado_comprobar.Lista_estanterias):
+            coste_palets_objetivo: int = (self.heuristica_palets1(estado_comprobar))
 
-            #coste_total = self.heur_robot_palet(estado_comprobar) + coste_total
+            coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
     
-        coste_total = coste_palets_objetivo + coste_robot_origen
+        coste_total = coste_palets_objetivo + coste_robot_origen + coste_palets_robot
 
         return coste_total
     
@@ -585,7 +588,7 @@ class Busqueda():
                 if estado_avance != None:
                     coste_h = self.heuristica_total(estado_avance)
                     if estado_avance.Robot_activado:
-                        coste_g1 = coste_g + 1
+                        coste_g1 = coste_g + 2
                     else:
                         coste_g1 = coste_g + 1 
 
@@ -600,9 +603,9 @@ class Busqueda():
                     coste_h = self.heuristica_total(estado_gir_der)
 
                     if estado_gir_der.Robot_activado:
-                        coste_g1 = coste_g + 1
+                        coste_g1 = coste_g + 4
                     else:
-                        coste_g1 = coste_g + 1
+                        coste_g1 = coste_g +3
 
                     coste_f_nuevo = coste_h + coste_g1
 
@@ -615,9 +618,9 @@ class Busqueda():
                     coste_h = self.heuristica_total(estado_gir_izq)
 
                     if estado_gir_der.Robot_activado:
-                        coste_g1 = coste_g + 1
+                        coste_g1 = coste_g + 4
                     else:
-                        coste_g1 = coste_g + 1
+                        coste_g1 = coste_g + 3
                    
                     coste_f_nuevo = coste_h + coste_g1
 
@@ -647,6 +650,8 @@ class Busqueda():
                 for s in sucesores:
                     if s != None :
                         print("Coste H abajo:", self.heuristica_total(s))
+                        print("Coste G abajo:",coste_sacado - self.heuristica_total(s))
+
                         self.imprimir(s,self.entorno)
 
             repetido:bool = False
@@ -736,13 +741,13 @@ def main():
     ]
 
    
-    paletillos = [Palet(1,1,True,2,2,False)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
+    paletillos = [Palet(3,3,True,2,2,False)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
 
     situacion1 = Estado(0,0,"E",False,paletillos)
 
     buscador = Busqueda(situacion1,entorno)
 
-    buscador.expandir(profundidad=1000)
+    buscador.expandir(profundidad=2000)
 
  
 
