@@ -47,6 +47,27 @@ class Estado():
         self.Robot_activado:bool = R_levantado
         self.Lista_estanterias: "list[Palet]" = Lista_palets
 
+        self.estado_padre: Any = None
+        self.costo_g: int = 0
+        self.accion: str = "Inicio"
+
+
+    def asignar_padre(self,padre: "Estado",coste_accion:int, nombre_accion: str) -> None:
+
+        self.estado_padre = padre
+        self.costo_g = padre.costo_g + coste_accion
+        self.accion = nombre_accion
+
+
+    def volver_inicio(self) -> str:
+
+        if self.estado_padre == None:
+            return self.accion
+        else:
+            return  self.estado_padre.volver_inicio() + " -> " + self.accion 
+
+
+
 
     def __eq__(self: "Estado", otro_estado: "Estado"):  # type: ignore
 
@@ -64,6 +85,8 @@ class Estado():
         return hash((self.Robot_x,self.Robot_y,self.Robot_orientacion,self.Robot_activado,hash_palets))
 
 
+
+
 class Busqueda():
 
     def __init__(self,estado_inicial: "Estado", entorno: "list[list]") -> None:
@@ -74,8 +97,8 @@ class Busqueda():
             'E': (0, 1),
             'O': (0, -1)
         }
-        self.rotar_izquierda = {'N': 'O', 'O': 'S', 'S': 'E', 'E': 'N'}
-        self.rotar_derecha = {'N': 'E', 'E': 'S', 'S': 'O', 'O': 'N'}
+        self.rotar_derecha = {'N': 'O', 'O': 'S', 'S': 'E', 'E': 'N'}
+        self.rotar_izquierda = {'N': 'E', 'E': 'S', 'S': 'O', 'O': 'N'}
 
         self.estado_ini = estado_inicial
         self.estado_actual = estado_inicial
@@ -151,10 +174,6 @@ class Busqueda():
             
         return coste
 
-
-
-    
-
     def heuristica_total(self,estado_comprobar: Estado) -> int:
         
         
@@ -165,18 +184,15 @@ class Busqueda():
         coste_palets_objetivo = 0
 
         if len(estado_comprobar.Lista_estanterias):
-            coste_palets_objetivo: int = (self.heuristica_palets1(estado_comprobar))
+            #coste_palets_objetivo: int = (self.heuristica_palets1(estado_comprobar))
 
+            # Que el robot quiera ir a por los palets que tienen que moverse
             coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
     
         coste_total = coste_palets_objetivo + coste_robot_origen + coste_palets_robot
 
         return coste_total
     
-
-
-
-
     def levantar_bajar(self, estado: Estado) -> Any:
         """
         Tiene que estar debajo de un palet para poder usar esto,
@@ -510,15 +526,7 @@ class Busqueda():
 
 
     def expandir(self,profundidad= 100):
-        """
-        Expande a partir del primer elemento de la lista abierta de estados.
-
         
-        
-        """
-
-        
-
         ciclos = 0
         Exito = False
         estado_sacado = None    #type: ignore
@@ -542,6 +550,9 @@ class Busqueda():
                 print("Profundidad: ",ciclos)
                 c_h = self.heuristica_total(estado_sacado)
                 print("Coste H: ",c_h)
+                print("Coste G: ",estado_sacado.costo_g)
+
+
 
             ciclos = ciclos+1
             coste_g = 0
@@ -552,7 +563,7 @@ class Busqueda():
                 c_h = self.heuristica_total(estado_sacado)
 
                 #print("Coste H: ",c_h)
-                coste_g = coste_sacado-c_h                         
+                coste_g: int = estado_sacado.costo_g                         
                 
                 #print("Coste G: ",coste_g)
                 #print("Coste F: ",coste_sacado)
@@ -569,6 +580,8 @@ class Busqueda():
                     print("Coste G: ",coste_g)
 
                     self.imprimir(estado_sacado,self.entorno)
+
+                    print(estado_sacado.volver_inicio())
 
             else:
 
@@ -594,6 +607,8 @@ class Busqueda():
 
                     coste_f_nuevo = coste_h + coste_g1
 
+                    estado_avance.asignar_padre(estado_sacado,coste_g1,"A")
+
                     sucesores.append(estado_avance)
                     self.lis_abierta.insertar(dato=estado_avance,prioridad=coste_f_nuevo)
 
@@ -603,11 +618,13 @@ class Busqueda():
                     coste_h = self.heuristica_total(estado_gir_der)
 
                     if estado_gir_der.Robot_activado:
-                        coste_g1 = coste_g + 4
+                        coste_g1 = coste_g + 3
                     else:
-                        coste_g1 = coste_g +3
+                        coste_g1 = coste_g + 2
 
                     coste_f_nuevo = coste_h + coste_g1
+                    
+                    estado_gir_der.asignar_padre(estado_sacado,coste_g1,"GD")
 
                     sucesores.append(estado_gir_der)
                     self.lis_abierta.insertar(dato=estado_gir_der,prioridad=coste_f_nuevo)
@@ -618,11 +635,12 @@ class Busqueda():
                     coste_h = self.heuristica_total(estado_gir_izq)
 
                     if estado_gir_der.Robot_activado:
-                        coste_g1 = coste_g + 4
-                    else:
                         coste_g1 = coste_g + 3
+                    else:
+                        coste_g1 = coste_g + 2
                    
                     coste_f_nuevo = coste_h + coste_g1
+                    estado_gir_izq.asignar_padre(estado_sacado,coste_g1,"GI")
 
                     sucesores.append(estado_gir_izq)
                     self.lis_abierta.insertar(dato=estado_gir_izq,prioridad=coste_f_nuevo)
@@ -636,6 +654,7 @@ class Busqueda():
                     coste_g1 = coste_g + 3
 
                     coste_f_nuevo = coste_h + coste_g1
+                    estado_levantar.asignar_padre(estado_sacado,coste_g1,"L")
 
                     sucesores.append(estado_levantar)
                     self.lis_abierta.insertar(dato=estado_levantar,prioridad=coste_f_nuevo)
@@ -643,16 +662,20 @@ class Busqueda():
 
      
             # Imprimir los sucesores generados
+            
             if Exito == False:
                 #print(self.lis_abierta)
 
                 print("Cantidad sucesores creados: ", len(sucesores))
                 for s in sucesores:
                     if s != None :
+                        print(s.accion)
                         print("Coste H abajo:", self.heuristica_total(s))
                         print("Coste G abajo:",coste_sacado - self.heuristica_total(s))
 
                         self.imprimir(s,self.entorno)
+            
+            
 
             repetido:bool = False
 
@@ -732,7 +755,7 @@ class Busqueda():
 def main():
 
     entorno = [
-        [0, 0, 0, 0,0,0],
+        [0, 0, 0, 1,0,0],
         [0, 0, 0, 0,0,0],
         [0, 0, 0, 0,0,0],
         [0, 0, 0, 0,0,0],
@@ -747,9 +770,7 @@ def main():
 
     buscador = Busqueda(situacion1,entorno)
 
-    buscador.expandir(profundidad=2000)
-
- 
+    buscador.expandir(profundidad=1)
 
     return None
 
