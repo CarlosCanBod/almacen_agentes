@@ -55,7 +55,7 @@ class Estado():
     def asignar_padre(self,padre: "Estado",coste_accion:int, nombre_accion: str) -> None:
 
         self.estado_padre = padre
-        self.costo_g = padre.costo_g + coste_accion
+        self.costo_g = coste_accion
         self.accion = nombre_accion
 
 
@@ -532,7 +532,7 @@ class Busqueda():
         estado_sacado = None    #type: ignore
         coste_sacado = 0
 
-        while  (profundidad >= ciclos) and Exito == False:
+        while  (profundidad > ciclos) and Exito == False:
 
             repetido:bool = False
             sucesores: "list[Estado]" =[]
@@ -565,7 +565,6 @@ class Busqueda():
                 #print("Coste H: ",c_h)
                 coste_g: int = estado_sacado.costo_g                         
                 
-                #print("Coste G: ",coste_g)
                 #print("Coste F: ",coste_sacado)
 
 
@@ -601,7 +600,7 @@ class Busqueda():
                 if estado_avance != None:
                     coste_h = self.heuristica_total(estado_avance)
                     if estado_avance.Robot_activado:
-                        coste_g1 = coste_g + 2
+                        coste_g1 = coste_g + 9
                     else:
                         coste_g1 = coste_g + 1 
 
@@ -623,7 +622,7 @@ class Busqueda():
                         coste_g1 = coste_g + 2
 
                     coste_f_nuevo = coste_h + coste_g1
-                    
+
                     estado_gir_der.asignar_padre(estado_sacado,coste_g1,"GD")
 
                     sucesores.append(estado_gir_der)
@@ -652,7 +651,6 @@ class Busqueda():
                     coste_h = self.heuristica_total(estado_levantar)
 
                     coste_g1 = coste_g + 3
-
                     coste_f_nuevo = coste_h + coste_g1
                     estado_levantar.asignar_padre(estado_sacado,coste_g1,"L")
 
@@ -670,8 +668,8 @@ class Busqueda():
                 for s in sucesores:
                     if s != None :
                         print(s.accion)
-                        print("Coste H abajo:", self.heuristica_total(s))
-                        print("Coste G abajo:",coste_sacado - self.heuristica_total(s))
+                        print("Coste1 H abajo:", self.heuristica_total(s))
+                        print("Coste1 G abajo:",s.costo_g)
 
                         self.imprimir(s,self.entorno)
             
@@ -691,8 +689,7 @@ class Busqueda():
             c_h = self.heuristica_total(estado_sacado)
 
             print("Coste H: ",c_h)
-            coste_g = coste_sacado-c_h 
-            print("Coste G: ",coste_g)
+            print("Coste G: ",estado_sacado.costo_g)
 
             self.imprimir(estado_sacado,self.entorno)
 
@@ -757,7 +754,7 @@ def main():
     entorno = [
         [0, 0, 0, 1,0,0],
         [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
+        [0, 0, 0, 1,0,0],
         [0, 0, 0, 0,0,0],
         [0, 0, 0, 0,0,0]
         #[0, 0, 0, 0,0,0]
@@ -770,7 +767,7 @@ def main():
 
     buscador = Busqueda(situacion1,entorno)
 
-    buscador.expandir(profundidad=1)
+    buscador.expandir(profundidad=500)
 
     return None
 
