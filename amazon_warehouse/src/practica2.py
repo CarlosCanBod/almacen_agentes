@@ -2,24 +2,44 @@
 import rospy
 from utils import navigation
 
+from scripts.Planificador import Busqueda, Estado, Palet
+
+
 class Practica1:
 
     def __init__(self):
+
         self.nav = navigation.Navigation()
-	# NOTA: Implementar la funcion execSearch con el algoritmo de busqueda seleccionado. Una vez implementado, descomentar la llamada a la funcion en este init, generar el plan a partir de las
-	# peticiones (requests) que reciba, y ejecutarlo en Gazebo
-	# self.execSearch(requests)
+        self.execSearch()
 
-	# NOTA: Estas dos lineas sirven para comprobar que el paquete funciona correctamente. Ejecutan un plan definido a mano. Deben ser comentadas/eliminadas una vez se implemente
-	# execSearch
-        self.execTest0()
-        #self.execTest1()
+        # NOTA: Implementar la funcion execSearch con el algoritmo de busqueda seleccionado. Una vez implementado, descomentar la llamada a la funcion en este init, generar el plan a partir de las
+        # peticiones (requests) que reciba, y ejecutarlo en Gazebo
 
-    def execSearch(self,requests):
-	print("SEARCH ")
-	# NOTA: Implementa aqui tu algoritmo de busqueda. Para ello, se pueden generar las clases, funciones, y ficheros adicionales que se consideren necesarios
+	
 
-    # DEBUG
+     
+
+    def execSearch(self):
+        entorno = [
+        [0, 0, 0, 0,0,0],
+        [0, 0, 0, 0,0,0],
+        [0, 0, 0, 0,0,0],
+        [0, 0, 0, 0,0,0],
+        [0, 0, 0, 0,0,0],
+        [0, 0, 0, 0,0,0]
+        ]
+
+        paletillos = [Palet(2,2,False,2,3,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
+
+        situacion1 = Estado(0,0,"S",False,paletillos)
+
+        buscador = Busqueda(situacion1,entorno)
+
+        buscador.expandir(profundidad=5000)
+
+	    # NOTA: Implementa aqui tu algoritmo de busqueda. Para ello, se pueden generar las clases, funciones, y ficheros adicionales que se consideren necesarios
+
+        # DEBUG
 
     def execTest0(self):
         print("TEST WAREHOUSE0")

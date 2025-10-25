@@ -19,7 +19,16 @@ find_package (gazebo REQUIRED)
 
 catkin_package(
   #INCLUDE_DIRS include
+  LIBRARIES amazon_warehouse
   CATKIN_DEPENDS gazebo_plugins gazebo_ros roscpp
+)
+
+catkin_install_python(PROGRAMS
+  scripts/Class_colas_prioridad.py 
+  scripts/Planificador.py 
+  src/utils/obstacles.py
+
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 

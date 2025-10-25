@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from typing import Any
 import numpy as np  # Se usa para copiar el entorno para el mapa.
 
