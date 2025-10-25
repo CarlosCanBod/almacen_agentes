@@ -183,6 +183,9 @@ class cola_prio():
 
                 if nodo_previo != None:
                     nodo_previo.siguiente = None #Asi el nodo que se devuelve ya no tiene quien lo referencie
+            else:
+                # Si es el unico, no hay siguiente, se borra la cabeza.
+                self.cabeza = None
 
 
             return nodo_actual
