@@ -99,7 +99,7 @@ class Busqueda():
         return None
     
     def heuristica_robot_origen(self,robot_x,robot_y,robot_orientacion,rob_activado)-> int:
-        coste = (self.estado_ini.Robot_x- robot_x)**2 + (self.estado_ini.Robot_y - robot_y)**2
+        coste = abs(self.estado_ini.Robot_x- robot_x) + abs(self.estado_ini.Robot_y - robot_y)
 
         if robot_orientacion != self.estado_ini.Robot_orientacion:
             coste = coste + 1
@@ -117,7 +117,7 @@ class Busqueda():
         if lista_palets != None:
             for palet in lista_palets:
 
-                c1 = (palet.x_objetivo-palet.pos_x)**2 + (palet.y_objetivo-palet.pos_y)**2
+                c1 = abs(palet.x_objetivo-palet.pos_x) + abs(palet.y_objetivo-palet.pos_y)
 
 
                 if palet.ang_actual != palet.ang_objetivo:
@@ -153,22 +153,23 @@ class Busqueda():
 
     
 
-    def heuristica_total(self,estado_comprobar: Estado,coste_previo:int = 0) -> int:
-        coste_total = coste_previo
+    def heuristica_total(self,estado_comprobar: Estado) -> int:
         
         lista_palets = estado_comprobar.Lista_estanterias
-
+        coste_robot_origen = 0
     
-        coste_total = self.heuristica_robot_origen(estado_comprobar.Robot_x,estado_comprobar.Robot_y, estado_comprobar.Robot_orientacion,estado_comprobar.Robot_activado) + coste_total
-       
+        #coste_robot_origen = self.heuristica_robot_origen(estado_comprobar.Robot_x,estado_comprobar.Robot_y, estado_comprobar.Robot_orientacion,estado_comprobar.Robot_activado)
+        coste_palets_objetivo = 0
 
         if len(lista_palets):
-            coste_total: int = (self.heuristica_palets1(lista_palets)  + coste_total)
+            coste_palets_objetivo: int = (self.heuristica_palets1(lista_palets))
 
-            coste_total = self.heur_robot_palet(estado_comprobar) + coste_total
+            #coste_total = self.heur_robot_palet(estado_comprobar) + coste_total
     
-        
+        coste_total = coste_palets_objetivo + coste_robot_origen
+
         return coste_total
+    
 
 
 
@@ -232,9 +233,9 @@ class Busqueda():
                         return None
 
             # Que no pueda girar en los bordes con palet
-            if cord_robot_x == 0 or cord_robot_x == self.columnas:
+            if cord_robot_x == 0 or cord_robot_x == self.columnas-1:
                 return None
-            if cord_robot_y == 0 or cord_robot_y == self.filas:
+            if cord_robot_y == 0 or cord_robot_y == self.filas-1:
                 return None
 
 
@@ -289,9 +290,9 @@ class Busqueda():
                         return None
 
 #            Que no pueda girar en los bordes con palet
-            if cord_robot_x == 0 or cord_robot_x == self.columnas:
+            if cord_robot_x == 0 or cord_robot_x == self.columnas -1:
                 return None
-            if cord_robot_y == 0 or cord_robot_y == self.filas:
+            if cord_robot_y == 0 or cord_robot_y == self.filas -1:
                 return None
             for palet in lis_estanterias:
 
@@ -413,7 +414,10 @@ class Busqueda():
             
             if lleva_vertical == True:
 
-                
+                if Ry_n == 0 or Ry_n == self.filas -1 :
+                    return None
+                 
+
                 # QUITAR ESTE TRY POR ALGO BUENO 
                 try:
                     if 0 > Rx_n >= self.filas  or 0 > Ry_n + 1 >= self.columnas or self.entorno[Rx_n][Ry_n+1]:
@@ -450,6 +454,9 @@ class Busqueda():
                                     return None
             else:
                 # Si lo lleva en horizontal
+
+                if Rx_n == 0 or Rx_n == self.columnas -1 :
+                    return None
 
 
                 try:
@@ -506,6 +513,9 @@ class Busqueda():
         
         
         """
+
+        
+
         ciclos = 0
         Exito = False
         estado_sacado = None    #type: ignore
@@ -575,7 +585,7 @@ class Busqueda():
                 if estado_avance != None:
                     coste_h = self.heuristica_total(estado_avance)
                     if estado_avance.Robot_activado:
-                        coste_g1 = coste_g + 2
+                        coste_g1 = coste_g + 1
                     else:
                         coste_g1 = coste_g + 1 
 
@@ -590,7 +600,7 @@ class Busqueda():
                     coste_h = self.heuristica_total(estado_gir_der)
 
                     if estado_gir_der.Robot_activado:
-                        coste_g1 = coste_g + 2
+                        coste_g1 = coste_g + 1
                     else:
                         coste_g1 = coste_g + 1
 
@@ -605,7 +615,7 @@ class Busqueda():
                     coste_h = self.heuristica_total(estado_gir_izq)
 
                     if estado_gir_der.Robot_activado:
-                        coste_g1 = coste_g + 2
+                        coste_g1 = coste_g + 1
                     else:
                         coste_g1 = coste_g + 1
                    
@@ -630,14 +640,14 @@ class Busqueda():
 
      
             # Imprimir los sucesores generados
-            #if Exito == False:
+            if Exito == False:
                 #print(self.lis_abierta)
 
-                #print("Cantidad sucesores creados: ", len(sucesores))
-                #for s in sucesores:
-                    #if s != None :
-                        #print("Estado coste:", self.heuristica_total(s,0))
-                        #self.imprimir(s,self.entorno)
+                print("Cantidad sucesores creados: ", len(sucesores))
+                for s in sucesores:
+                    if s != None :
+                        print("Coste H abajo:", self.heuristica_total(s))
+                        self.imprimir(s,self.entorno)
 
             repetido:bool = False
 
@@ -721,18 +731,18 @@ def main():
         [0, 0, 0, 0,0,0],
         [0, 0, 0, 0,0,0],
         [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
         [0, 0, 0, 0,0,0]
+        #[0, 0, 0, 0,0,0]
     ]
 
    
-    paletillos = [Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
+    paletillos = [Palet(1,1,True,2,2,False)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
 
     situacion1 = Estado(0,0,"E",False,paletillos)
 
     buscador = Busqueda(situacion1,entorno)
 
-    buscador.expandir(profundidad=4000)
+    buscador.expandir(profundidad=1000)
 
  
 
