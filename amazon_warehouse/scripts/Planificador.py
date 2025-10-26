@@ -725,18 +725,22 @@ class Busqueda():
 def main():
 
     entorno = [
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0]
-        #[0, 0, 0, 0,0,0]
+        [0, 1, 1, 1, 1, 1, 1, 0],
+        [0, 1, 0, 0, 0, 0, 1, 0],
+        [0, 1, 0, 0, 0, 0, 1, 0],
+        [1, 1, 1, 0, 0, 0, 1, 1],
+        [1, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 1, 1, 1, 1],
+        [1, 1, 1, 0, 0, 0, 1, 1],
+        [0, 0, 1, 0, 0, 0, 1, 0],
+        [0, 0, 1, 1, 1, 1, 1, 0]
     ]
 
    
-    paletillos = [Palet(2,2,False,2,3,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
+    paletillos = [Palet(5,2,False,5,2,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
 
-    situacion1 = Estado(0,0,"S",False,paletillos)
+    situacion1 = Estado(8,4,"N",False,paletillos)
 
     buscador = Busqueda(situacion1,entorno)
 
