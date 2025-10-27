@@ -49,6 +49,7 @@ class Practica1:
             camino_pasos = camino_junto.split(".")
 
             for orden in camino_pasos:
+                print("Instruccion: ",orden)
 
                 if orden == "A":
                     self.nav.move(1)
@@ -63,7 +64,7 @@ class Practica1:
                 else:
                     print("Instruccion: ",orden, " ignorada")
 
-
+                rospy.sleep(1)
         else:
             print("No encontrado camino")
 

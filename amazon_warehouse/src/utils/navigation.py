@@ -173,16 +173,23 @@ class Navigation():
 
                 if (angle_to_goal < 0 and self.current_pose.theta < 0) or (angle_to_goal >= 0 and self.current_pose.theta >= 0):
                     if self.current_pose.theta > angle_to_goal:
-                        vel_msg.angular.z = -0.2
-                    else:
+                        #print("GIRANDO RARO1")
                         vel_msg.angular.z = 0.2
+                    else:
+                        #print("GIRANDO RARO2")
+
+                        vel_msg.angular.z = -0.2
                 else:
                     if ((pi - abs(angle_to_goal)) + (pi - abs(self.current_pose.theta))) < ((abs(angle_to_goal) - 0) + (abs(self.current_pose.theta) - 0)):
                         if self.current_pose.theta > 0: vel_msg.angular.z = 0.2
-                        else: vel_msg.angular.z = -0.2
+                        else: 
+                            vel_msg.angular.z = 0.2 
+                            #print("GIRANDO RARO3")
                     else:
                         if self.current_pose.theta > 0: vel_msg.angular.z = -0.2
-                        else: vel_msg.angular.z = 0.2
+                        else: 
+                            #print("GIRANDO RARO4")
+                            vel_msg.angular.z = -0.2
             else:
                 if movement == 0: # west
                     if self.current_pose.y < goal_y: vel_msg.linear.x = 0.2
@@ -197,6 +204,7 @@ class Navigation():
                     if self.current_pose.x > goal_x: vel_msg.linear.x = 0.2
                     else: vel_msg.linear.x = -0.2
                 vel_msg.angular.z = 0.0
+
             self.velocity_publisher.publish(vel_msg)
             r.sleep()
             current_distance= sqrt(pow((self.current_pose.x - goal_x), 2) + pow((self.current_pose.y - goal_y), 2))
@@ -216,16 +224,17 @@ class Navigation():
         if target_rad > pi:
             target_rad -= 2*pi
         self.goal_pose.theta = target_rad
-        vel_msg.angular.z = 0.2
+        vel_msg.angular.z = -0.2
         #print("target", target_rad, " current ", self.current_pose.theta)
         while abs(target_rad - self.current_pose.theta) > 0.05:
             self.velocity_publisher.publish(vel_msg)    
-            #print("target", target_rad, " current ", self.current_pose.theta)
+            #print("targetIZQ ", target_rad, " current ", self.current_pose.theta)
             r.sleep()
         #After the loop, stops the robot
         vel_msg.angular.z = 0
         #Force the robot to stop
         self.velocity_publisher.publish(vel_msg)
+        print("FIN GIRO IZQUIERDA")
         rospy.sleep(1)
 
     def rotateRight(self):
@@ -233,6 +242,7 @@ class Navigation():
         vel_msg = Twist()
         target = 90
         r = rospy.Rate(4)
+        target_rad = 0
         if self.rotations == 0:
             target_rad = -pi/2
         elif self.rotations == 1:
@@ -248,11 +258,11 @@ class Navigation():
             self.rotations = self.rotations - 1
 
         self.goal_pose.theta = target_rad
-        vel_msg.angular.z = -0.2
+        vel_msg.angular.z = 0.2
         #print("target", target_rad, " current ", self.current_pose.theta)
         while abs(target_rad - self.current_pose.theta) > 0.05:
             self.velocity_publisher.publish(vel_msg)    
-            #print("target", target_rad, " current ", self.current_pose.theta)
+            #print("targetDER", target_rad, " current ", self.current_pose.theta)
             r.sleep()
         #After the loop, stops the robot
         vel_msg.angular.z = 0
@@ -261,6 +271,7 @@ class Navigation():
         rospy.sleep(1)
 
     def classifyMovement(self, goal_x, goal_y):
+        movement = 0
         if self.goal_pose.x < goal_x:
             movement = 1 # north
         elif self.goal_pose.x > goal_x:
