@@ -261,7 +261,7 @@ class Estado():
         if self.estado_padre == None:
             return self.accion
         else:
-            return  self.estado_padre.volver_inicio() + " -> " + self.accion 
+            return  self.estado_padre.volver_inicio() + "." + self.accion 
 
 
 
@@ -708,6 +708,8 @@ class Busqueda():
         Exito = False
         estado_sacado = None    #type: ignore
         coste_sacado = 0
+        camino_hecho = None
+
 
         print("INICIAL DIBUJO", self.estado_ini.Lista_estanterias[0].ang_actual)
         self.imprimir(self.estado_ini,self.entorno)
@@ -769,7 +771,8 @@ class Busqueda():
                             print("PADRE",papi.Lista_estanterias[0].ang_actual)
                             self.imprimir(papi,self.entorno)
                     
-                    print(estado_sacado.volver_inicio())
+                    camino_hecho = estado_sacado.volver_inicio()
+                    print(camino_hecho)
 
             else:
 
@@ -841,7 +844,13 @@ class Busqueda():
 
                     coste_g1 = coste_g + 3
                     coste_f_nuevo = coste_h + coste_g1*factor_g
-                    estado_levantar.asignar_padre(estado_sacado,coste_g1,"L")
+
+                    if estado_sacado.Robot_activado: # Si estaba activado ahora se baja
+                        estado_levantar.asignar_padre(estado_sacado,coste_g1,"B")
+                    else: # Se sube el palet 
+                        estado_levantar.asignar_padre(estado_sacado,coste_g1,"S")
+
+
 
                     sucesores.append(estado_levantar)
                     self.lis_abierta.insertar(dato=estado_levantar,prioridad=coste_f_nuevo)
@@ -873,7 +882,7 @@ class Busqueda():
             print("Error, no se encontro solucion")
 
         print("Exito: ", Exito)
-        return None
+        return camino_hecho
 
 
     def imprimir(self,estado: Estado ,entorno) -> None:

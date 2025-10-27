@@ -2,8 +2,7 @@
 import rospy    #type: ignore
 
 from utils import navigation
-from utils import Planificador 
-
+from utils import Planificador as pl
 
 
 print("ADIOSSS")
@@ -15,7 +14,7 @@ class Practica1:
 
         self.nav = navigation.Navigation()
         self.execSearch()
-
+        #self.execTest0()
         # NOTA: Implementar la funcion execSearch con el algoritmo de busqueda seleccionado. Una vez implementado, descomentar la llamada a la funcion en este init, generar el plan a partir de las
         # peticiones (requests) que reciba, y ejecutarlo en Gazebo
 
@@ -25,25 +24,51 @@ class Practica1:
 
     def execSearch(self):
         entorno = [
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0],
-        [0, 0, 0, 0,0,0]
+            [0, 1, 1, 1, 1, 1, 1, 0],
+            [0, 1, 0, 0, 0, 0, 1, 0],
+            [0, 1, 0, 0, 0, 0, 1, 0],
+            [1, 1, 9, 9, 0, 0, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 9, 9, 9, 1],
+            [1, 1, 1, 0, 0, 0, 1, 1],
+            [0, 0, 1, 0, 0, 0, 1, 0],
+            [0, 0, 1, 1, 1, 1, 1, 0]
         ]
 
-        paletillos = [Planificador.Palet(2,2,False,2,3,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
+    
+        paletillos = [pl.Palet(5,2,False,1,5,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
 
-        situacion1 = Planificador.Estado(0,0,"S",False,paletillos)
+        situacion1 = pl.Estado(8,4,"N",False,paletillos)
 
-        buscador = Planificador.Busqueda(situacion1,entorno)
+        buscador = pl.Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=5000)
+        camino_junto = buscador.expandir(profundidad=15000)
 
-	    # NOTA: Implementa aqui tu algoritmo de busqueda. Para ello, se pueden generar las clases, funciones, y ficheros adicionales que se consideren necesarios
+        if camino_junto != None:
+            camino_pasos = camino_junto.split(".")
 
-        # DEBUG
+            for orden in camino_pasos:
+
+                if orden == "A":
+                    self.nav.move(1)
+                elif orden == "GD":
+                    self.nav.rotateRight()
+                elif orden == "GI":
+                    self.nav.rotateLeft()
+                elif orden == "S":
+                    self.nav.upLift()
+                elif orden == "B":
+                    self.nav.downLift()
+                else:
+                    print("Instruccion: ",orden, " ignorada")
+
+
+        else:
+            print("No encontrado camino")
+
+
+
 
     def execTest0(self):
         print("TEST WAREHOUSE0")
