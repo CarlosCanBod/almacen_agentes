@@ -1,8 +1,12 @@
 #!/usr/bin/env python
-import rospy
-from utils import navigation
+import rospy    #type: ignore
 
-from scripts.Planificador import Busqueda, Estado, Palet
+from utils import navigation
+from utils import Planificador 
+
+
+
+print("ADIOSSS")
 
 
 class Practica1:
@@ -29,11 +33,11 @@ class Practica1:
         [0, 0, 0, 0,0,0]
         ]
 
-        paletillos = [Palet(2,2,False,2,3,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
+        paletillos = [Planificador.Palet(2,2,False,2,3,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)]
 
-        situacion1 = Estado(0,0,"S",False,paletillos)
+        situacion1 = Planificador.Estado(0,0,"S",False,paletillos)
 
-        buscador = Busqueda(situacion1,entorno)
+        buscador = Planificador.Busqueda(situacion1,entorno)
 
         buscador.expandir(profundidad=5000)
 

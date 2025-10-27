@@ -1,11 +1,48 @@
 #!/usr/bin/env python
-import obstacles
+print("HOLAAAAAA")
+#import obstacles
 import rospy
 from geometry_msgs.msg import Pose2D, Twist, Point, Quaternion
 from std_msgs.msg import Float32
 from math import radians, copysign, sqrt, pow, pi, atan2
 from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
+
+
+
+class Obstacles():
+
+    def manageObstacles(self):
+        print("Management of obstacles starting")
+        obstacle = False
+        pose1 = Pose2D()
+        pose1.x = 3
+        pose1.y = -4
+        while(True):
+            r = random()
+            if (obstacle == False and r > 0.5):
+                if sqrt(pow((self.pose.x - pose1.x), 2) + pow((self.pose.y - pose1.y), 2)) > 2:
+                    os.system('rosrun gazebo_ros spawn_model -file /home/user/catkin_ws/src/amazon_warehouse/models/obstacle/model.sdf -sdf -x ' + str(pose1.x) + ' -y ' + str(pose1.y) + ' -z ' + str(pose1.theta) + ' -model obstacle')
+                    obstacle = True
+            elif obstacle == True and r > 0.5:
+                os.system('rosservice call gazebo/delete_model \'{model_name: obstacle}\'')
+                obstacle = False
+            rospy.sleep(10)
+
+    def __init__(self, pose):
+        self.pose = pose
+        self.thread = threading.Thread(target=self.manageObstacles)
+        self.thread.start()
+
+
+
+
+
+
+
+
+
+
 
 class Navigation():
 
@@ -30,7 +67,7 @@ class Navigation():
         rospy.Subscriber('/ground_truth/state',Odometry,self.groundTruthCb) # True state of the robot
 
         if self.obstacles:
-            obs = obstacles.Obstacles(self.current_pose)
+            obs = Obstacles(self.current_pose)
 
         rospy.sleep(1)
 

@@ -15,6 +15,7 @@
                 <arg name="use_sim_time" value="true" />
         </include>
 
+        <node pkg="amazon_warehouse" type="practica2.py" name="control_gazebo" output="screen"/>
 
   
 </launch>
