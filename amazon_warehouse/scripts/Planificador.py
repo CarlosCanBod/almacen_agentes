@@ -97,8 +97,8 @@ class Busqueda():
             'E': (0, 1),
             'O': (0, -1)
         }
-        self.rotar_derecha = {'N': 'O', 'O': 'S', 'S': 'E', 'E': 'N'}
-        self.rotar_izquierda = {'N': 'E', 'E': 'S', 'S': 'O', 'O': 'N'}
+        self.rotar_izquierda = {'N': 'O', 'O': 'S', 'S': 'E', 'E': 'N'}
+        self.rotar_derecha = {'N': 'E', 'E': 'S', 'S': 'O', 'O': 'N'}
 
         self.estado_ini = estado_inicial
         self.estado_actual = estado_inicial
@@ -124,11 +124,12 @@ class Busqueda():
     def heuristica_robot_origen(self,robot_x,robot_y,robot_orientacion,rob_activado)-> int:
         coste = abs(self.estado_ini.Robot_x- robot_x) + abs(self.estado_ini.Robot_y - robot_y)
 
-        if robot_orientacion != self.estado_ini.Robot_orientacion:
-            coste = coste + 1
+        if coste == 0:
+            if robot_orientacion != self.estado_ini.Robot_orientacion:
+                coste = coste + 1
 
-        if rob_activado:
-            coste =+ 1
+            if rob_activado:
+                coste =+ 1
 
         return coste
 
@@ -147,7 +148,7 @@ class Busqueda():
 
                 #if palet.x_objetivo==palet.pos_x and palet.y_objetivo==palet.pos_y:
                 if palet.ang_actual != palet.ang_objetivo:
-                    c1 = c1 + 1
+                    c1 = 2*c1 + 1
 
                 coste = coste + c1
 
@@ -165,10 +166,12 @@ class Busqueda():
         for palet in lista_palets:
             x2 = palet.pos_x
             y2 = palet.pos_y
+            ang_actual_p = palet.ang_actual
             x3= palet.x_objetivo
             y3 = palet.y_objetivo
+            ang_obj_p = palet.ang_objetivo
             
-            if x2 != x3 or y2 != y3:
+            if x2 != x3 or y2 != y3 or ang_obj_p!= ang_actual_p:
                 dist = abs(x2-x1) + abs(y2-y1)
                 coste = coste + dist
             
@@ -257,11 +260,10 @@ class Busqueda():
 
             # Que no pueda girar en los bordes con palet
             if cord_robot_x == 0 or cord_robot_x == self.filas-1:
-                print("GIRO ILEGAL")
+                #print("GIRO ILEGAL")
                 return None
             if cord_robot_y == 0 or cord_robot_y == self.columnas-1:
-                print("GIRO ILEGAL")
-
+                #print("GIRO ILEGAL")
                 return None
 
 
@@ -485,6 +487,8 @@ class Busqueda():
 
     def expandir(self,profundidad= 100):
         
+        factor_g: int = 2
+
         ciclos = 0
         Exito = False
         estado_sacado = None    #type: ignore
@@ -545,11 +549,11 @@ class Busqueda():
                     self.imprimir(estado_sacado,self.entorno)
 
 
-                    #papi: Estado = estado_sacado.estado_padre
-                    #while papi.estado_padre != None:
-                    #    papi = papi.estado_padre
-                    #    print("PADRE",papi.Lista_estanterias[0].ang_actual)
-                    #    self.imprimir(papi,self.entorno)
+                    papi: Estado = estado_sacado.estado_padre
+                    while papi.estado_padre != None:
+                        papi = papi.estado_padre
+                        print("PADRE",papi.Lista_estanterias[0].ang_actual)
+                        self.imprimir(papi,self.entorno)
                     
                     print(estado_sacado.volver_inicio())
 
@@ -569,19 +573,19 @@ class Busqueda():
                 if estado_avance != None:
                     coste_h = self.heuristica_total(estado_avance)
                     if estado_avance.Robot_activado:
-                        coste_g1 = coste_g + 9
+                        coste_g1 = coste_g + 2
                     else:
                         coste_g1 = coste_g + 1 
 
-                    coste_f_nuevo = coste_h + coste_g1
+                    coste_f_nuevo = coste_h + coste_g1*factor_g
 
                     estado_avance.asignar_padre(estado_sacado,coste_g1,"A")
 
                     sucesores.append(estado_avance)
                     self.lis_abierta.insertar(dato=estado_avance,prioridad=coste_f_nuevo)
                 
-                """
-                estado_gir_der: Estado = self.girar_der(estado_sacado)
+                
+                estado_gir_der: Estado = self.girar(estado_sacado,False)
                 if estado_gir_der != None:
                     coste_h = self.heuristica_total(estado_gir_der)
 
@@ -590,13 +594,13 @@ class Busqueda():
                     else:
                         coste_g1 = coste_g + 2
 
-                    coste_f_nuevo = coste_h + coste_g1
+                    coste_f_nuevo = coste_h + coste_g1*factor_g
 
                     estado_gir_der.asignar_padre(estado_sacado,coste_g1,"GD")
 
                     sucesores.append(estado_gir_der)
                     self.lis_abierta.insertar(dato=estado_gir_der,prioridad=coste_f_nuevo)
-                """
+                
 
 
                 estado_gir_izq: Estado = self.girar(estado_sacado,True)
@@ -609,7 +613,7 @@ class Busqueda():
                     else:
                         coste_g1 = coste_g + 2
                    
-                    coste_f_nuevo = coste_h + coste_g1
+                    coste_f_nuevo = coste_h + coste_g1*factor_g
                     estado_gir_izq.asignar_padre(estado_sacado,coste_g1,"GI")
 
                     sucesores.append(estado_gir_izq)
@@ -621,8 +625,8 @@ class Busqueda():
                     #print("robot activado en ciclo: ", ciclos)
                     coste_h = self.heuristica_total(estado_levantar)
 
-                    coste_g1 = coste_g + 3
-                    coste_f_nuevo = coste_h + coste_g1
+                    coste_g1 = coste_g + 1
+                    coste_f_nuevo = coste_h + coste_g1*factor_g
                     estado_levantar.asignar_padre(estado_sacado,coste_g1,"L")
 
                     sucesores.append(estado_levantar)
@@ -653,15 +657,6 @@ class Busqueda():
 
         if len(self.lis_abierta) == 0 and Exito == False:
             print("Error, no se encontro solucion")
-
-        #if estado_sacado != None:
-
-            #c_h = self.heuristica_total(estado_sacado)
-
-            #print("Coste H: ",c_h)
-            #print("Coste G: ",estado_sacado.costo_g)
-
-            #self.imprimir(estado_sacado,self.entorno)
 
         print("Exito: ", Exito)
         return None
@@ -724,42 +719,98 @@ class Busqueda():
 
 def main():
 
-    entorno = [
-        [0, 1, 1, 1, 1, 1, 1, 0],
-        [0, 1, 0, 0, 0, 0, 1, 0],
-        [0, 1, 0, 0, 0, 0, 1, 0],
-        [1, 1, 1, 0, 0, 0, 1, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 1, 1, 1, 1],
-        [1, 1, 1, 0, 0, 0, 1, 1],
-        [0, 0, 1, 0, 0, 0, 1, 0],
-        [0, 0, 1, 1, 1, 1, 1, 0]
-    ]
-
-   
-    paletillos = [Palet(5,2,False,5,2,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
-
-    situacion1 = Estado(8,4,"N",False,paletillos)
-
-    buscador = Busqueda(situacion1,entorno)
-
-    buscador.expandir(profundidad=5000)
+    entornto_almacen = False
     
-    """
-    print("original")
-    buscador.imprimir(situacion1,entorno)
 
-    a1 = buscador.avanzar(situacion1)
-    for i in range(1,6):
-        print("H",buscador.heuristica_total(a1))
-
-        a1 = buscador.girar(a1,izquierda=True)
+    if entornto_almacen:
+        entorno = [
+            [0, 1, 1, 1, 1, 1, 1, 0],
+            [0, 1, 0, 0, 0, 0, 1, 0],
+            [0, 1, 0, 0, 0, 0, 1, 0],
+            [1, 1, 1, 0, 0, 0, 1, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 1, 1, 1, 1],
+            [1, 1, 1, 0, 0, 0, 1, 1],
+            [0, 0, 1, 0, 0, 0, 1, 0],
+            [0, 0, 1, 1, 1, 1, 1, 0]
+        ]
 
     
-    buscador.imprimir(a1,entorno)
-    print("H",buscador.heuristica_total(a1))
-    """
+        paletillos = [Palet(5,2,False,5,2,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
+
+        situacion1 = Estado(8,4,"N",False,paletillos)
+
+        buscador = Busqueda(situacion1,entorno)
+
+        buscador.expandir(profundidad=50000)
+
+
+    else:
+        entorno = [
+            [0 ,0, 0],
+            [0 ,0, 0],
+            [0 ,0, 0],
+            [1 ,1, 1]
+        ]
+        
+        paletillos = [Palet(1,1,False,1,1,True)] 
+
+        situacion1 = Estado(0,0,"S",False,paletillos)
+
+        buscador = Busqueda(situacion1,entorno)
+
+        debugging = True
+
+        if debugging == False:
+            buscador.expandir(profundidad=5000000)
+        else:
+
+            print("H Total inicial: ",buscador.heuristica_total(situacion1), "G: ",situacion1.costo_g)
+            buscador.imprimir(situacion1,entorno)
+            a1 = buscador.avanzar(situacion1)
+
+
+            a1 = buscador.girar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+
+            a1 = buscador.avanzar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+
+            a1 = buscador.levantar_bajar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+
+            a1 = buscador.girar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+            a1 = buscador.levantar_bajar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+
+            a1 = buscador.avanzar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+            a1 = buscador.girar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+            a1 = buscador.avanzar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
+            a1 = buscador.girar(a1)
+            print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
+            buscador.imprimir(a1,entorno)
+
     return None
 
 
