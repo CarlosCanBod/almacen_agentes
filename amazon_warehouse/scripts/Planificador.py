@@ -192,7 +192,9 @@ class Busqueda():
             # Que el robot quiera ir a por los palets que tienen que moverse
             coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
     
-        coste_total = coste_palets_objetivo + coste_robot_origen + coste_palets_robot
+
+
+        coste_total = 10*coste_palets_objetivo + coste_robot_origen + 10*coste_palets_robot
 
         return coste_total
     
@@ -528,7 +530,8 @@ class Busqueda():
             estado_sacado: Estado = estado_coste.dato
             coste_sacado: int = estado_coste.prioridad
 
-
+            """
+            No funciona con varios palets en la lista, cambiar o quitar
             if estado_sacado.Robot_activado:
                 estanteria = estado_sacado.Lista_estanterias[0]
                 if estado_sacado.Robot_x != estanteria.pos_x:
@@ -537,16 +540,11 @@ class Busqueda():
                 if estado_sacado.Robot_y != estanteria.pos_y:
                     print("ROBOT LEVANTADO ILEGAL")
                     exit()
-
+            """
 
 
             if ciclos%100 == 0:
                 print("Profundidad: ",ciclos)
-                c_h = self.heuristica_total(estado_sacado)
-                #print("Coste H: ",c_h)
-                #print("Coste G: ",estado_sacado.costo_g)
-
-
 
             ciclos = ciclos+1
             coste_g = 0
@@ -646,7 +644,7 @@ class Busqueda():
                     #print("robot activado en ciclo: ", ciclos)
                     coste_h = self.heuristica_total(estado_levantar)
 
-                    coste_g1 = coste_g + 1
+                    coste_g1 = coste_g + 3
                     coste_f_nuevo = coste_h + coste_g1*factor_g
                     estado_levantar.asignar_padre(estado_sacado,coste_g1,"L")
 
@@ -743,7 +741,7 @@ def main():
     entornto_almacen = True
     
 
-    if entornto_almacen:
+    if entornto_almacen and buscar_errores == False:
         entorno = [
             [0, 1, 1, 1, 1, 1, 1, 0],
             [0, 1, 0, 0, 0, 0, 1, 0],
@@ -769,27 +767,27 @@ def main():
 
     else:
         entorno = [
-            [0 ,0, 0, 0],
-            [0 ,0, 0, 0],
-            [0 ,0, 0, 0],
-            [0 ,0, 0, 0],
-            [0 ,0, 0, 0],
-            [0 ,0, 0, 0],
-            [0 ,0, 0, 0],
+            [0 ,0, 0, 0,0,0],
+            [0 ,0, 0, 0,0,0],
+            [0 ,0, 0, 0,0,0],
+            [0 ,0, 0, 0,0,0],
+            [0 ,0, 0, 0,0,0],
+            [0 ,0, 0, 0,0,0],
+            [0 ,0, 0, 0,0,0],
            
             
         ]
         
-        paletillos = [Palet(5,1,True,2,1,False)] 
+        paletillos = [Palet(5,1,True,1,1,True),Palet(2,1,True,2,1,True)] 
 
-        situacion1 = Estado(0,0,"S",False,paletillos)
+        situacion1 = Estado(R_x=0,R_y=0,R_ang="S",R_levantado=False,Lista_palets=paletillos)
 
         buscador = Busqueda(situacion1,entorno)
 
         debugging = False
 
         if debugging == False:
-            buscador.expandir(profundidad=50000)
+            buscador.expandir(profundidad=25000)
         else:
 
             print("H Total inicial: ",buscador.heuristica_total(situacion1), "G: ",situacion1.costo_g)
