@@ -538,7 +538,7 @@ class Busqueda():
 
 
 
-            if ciclos%10 == 0:
+            if ciclos%100 == 0:
                 print("Profundidad: ",ciclos)
                 c_h = self.heuristica_total(estado_sacado)
                 #print("Coste H: ",c_h)
@@ -567,11 +567,12 @@ class Busqueda():
                     self.imprimir(estado_sacado,self.entorno)
 
 
-                    papi: Estado = estado_sacado.estado_padre
-                    while papi.estado_padre != None:
-                        papi = papi.estado_padre
-                        print("PADRE",papi.Lista_estanterias[0].ang_actual)
-                        self.imprimir(papi,self.entorno)
+                    if buscar_errores:
+                        papi: Estado = estado_sacado.estado_padre
+                        while papi.estado_padre != None:
+                            papi = papi.estado_padre
+                            print("PADRE",papi.Lista_estanterias[0].ang_actual)
+                            self.imprimir(papi,self.entorno)
                     
                     print(estado_sacado.volver_inicio())
 
@@ -643,7 +644,7 @@ class Busqueda():
                     #print("robot activado en ciclo: ", ciclos)
                     coste_h = self.heuristica_total(estado_levantar)
 
-                    coste_g1 = coste_g + 1
+                    coste_g1 = coste_g + 3
                     coste_f_nuevo = coste_h + coste_g1*factor_g
                     estado_levantar.asignar_padre(estado_sacado,coste_g1,"L")
 
@@ -755,7 +756,7 @@ def main():
         ]
 
     
-        paletillos = [Palet(5,2,False,5,2,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
+        paletillos = [Palet(5,2,False,4,5,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
 
         situacion1 = Estado(8,4,"N",False,paletillos)
 
