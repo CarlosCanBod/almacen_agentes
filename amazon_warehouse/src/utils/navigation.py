@@ -35,15 +35,6 @@ class Obstacles():
         self.thread.start()
 
 
-
-
-
-
-
-
-
-
-
 class Navigation():
 
     def __init__(self):
@@ -133,8 +124,8 @@ class Navigation():
 
         # Down lift
         i = 0
-        while(i < 10):
-            self.prismatic_publisher.publish(Float32(0))
+        while(i < 20):
+            self.prismatic_publisher.publish(Float32(0.0))
             r.sleep()
             i = i + 1
         rospy.sleep(1)
