@@ -644,7 +644,7 @@ class Busqueda():
                     #print("robot activado en ciclo: ", ciclos)
                     coste_h = self.heuristica_total(estado_levantar)
 
-                    coste_g1 = coste_g + 3
+                    coste_g1 = coste_g + 1
                     coste_f_nuevo = coste_h + coste_g1*factor_g
                     estado_levantar.asignar_padre(estado_sacado,coste_g1,"L")
 
