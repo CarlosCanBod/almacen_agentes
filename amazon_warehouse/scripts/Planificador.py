@@ -252,13 +252,16 @@ class Busqueda():
         else: 
 
             # Si lleva palet hay que hacer mas comprobaciones
-            # Que no este cerca de algun obstaculo o pared
+            # Que no este cerca de algun obstaculo 
+            # Los obstaculos tienen valor 9 en entorno, y paredes 1 por ejemplo
+            # No pueden girar si tienen bloque, pero si pared cerca
             for ancho in range(-1,1):
                 for alto in range(-1,1):
-                    if self.entorno[cord_robot_x +ancho][cord_robot_y + alto]:
+                    if self.entorno[cord_robot_x +ancho][cord_robot_y + alto] == 9:
                         return None
 
             # Que no pueda girar en los bordes con palet
+            # REVISAR QUE NO ELIMINE CAMINOS CORRECTOS
             if cord_robot_x == 0 or cord_robot_x == self.filas-1:
                 #print("GIRO ILEGAL")
                 return None
@@ -334,7 +337,7 @@ class Busqueda():
             return None
         if 0 > Ry_n or Ry_n >= self.columnas: 
             return None
-        if self.entorno[Rx_n][Ry_n]:
+        if self.entorno[Rx_n][Ry_n]: # En principio detecta obstaculo = 9 y paredes = 1
             return None
 
 
@@ -415,9 +418,9 @@ class Busqueda():
 
                 # QUITAR ESTE TRY POR ALGO BUENO 
                 try:
-                    if 0 > Rx_n >= self.filas  or 0 > Ry_n + 1 >= self.columnas or self.entorno[Rx_n][Ry_n+1]:
+                    if 0 > Rx_n >= self.filas  or 0 > Ry_n + 1 >= self.columnas or self.entorno[Rx_n][Ry_n+1] == 9:
                         return None
-                    elif 0 > Rx_n >= self.filas  or 0 > Ry_n - 1 >= self.columnas or self.entorno[Rx_n][Ry_n-1]:
+                    elif 0 > Rx_n >= self.filas  or 0 > Ry_n - 1 >= self.columnas or self.entorno[Rx_n][Ry_n-1] == 9:
                         return None
                 except:
                     return None
@@ -434,7 +437,6 @@ class Busqueda():
 
                         # Al estar en vertical el robot no se puede mover 1 encima o debajo
                         # de la posicion del palet
-                        # PENDIENTE
                         if palet.pos_x == Rx_n and (palet.pos_y-1 == (Ry_n) or palet.pos_y == (Ry_n) or palet.pos_y+1 == (Ry_n)):
                             print("Choque 2")
 
@@ -455,9 +457,9 @@ class Busqueda():
 
 
                 try:
-                    if 0 > Rx_n+1 > self.filas  or 0 > Ry_n  > self.columnas or self.entorno[Rx_n+1][Ry_n]:
+                    if 0 > Rx_n+1 > self.filas  or 0 > Ry_n  > self.columnas or self.entorno[Rx_n+1][Ry_n]== 9:
                         return None
-                    elif 0 > Rx_n-1 > self.filas  or 0 > Ry_n  > self.columnas or self.entorno[Rx_n-1][Ry_n]:
+                    elif 0 > Rx_n-1 > self.filas  or 0 > Ry_n  > self.columnas or self.entorno[Rx_n-1][Ry_n]== 9:
                         return None
                 except:
                     return None
@@ -708,7 +710,7 @@ class Busqueda():
                             pass
 
                     else:
-                        mapa[palet.pos_x][palet.pos_y] = 9
+                        mapa[palet.pos_x][palet.pos_y] = 7
                         try:
                             mapa[palet.pos_x+1][palet.pos_y] = 8        
                         except:
@@ -746,17 +748,17 @@ def main():
             [0, 1, 1, 1, 1, 1, 1, 0],
             [0, 1, 0, 0, 0, 0, 1, 0],
             [0, 1, 0, 0, 0, 0, 1, 0],
-            [1, 1, 1, 0, 0, 0, 1, 1],
+            [1, 1, 9, 9, 0, 0, 1, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
             [1, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 1, 1, 1, 1],
+            [1, 0, 0, 0, 9, 9, 9, 1],
             [1, 1, 1, 0, 0, 0, 1, 1],
             [0, 0, 1, 0, 0, 0, 1, 0],
             [0, 0, 1, 1, 1, 1, 1, 0]
         ]
 
     
-        paletillos = [Palet(5,2,False,4,5,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
+        paletillos = [Palet(5,2,False,1,5,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
 
         situacion1 = Estado(8,4,"N",False,paletillos)
 
