@@ -3,6 +3,8 @@ import numpy as np  # Se usa para copiar el entorno para el mapa.
 
 from Class_colas_prioridad import cola_prio,nodo_cola_prioridad
 
+buscar_errores: bool = False
+
 
 class Palet():
     def __init__(self,x_inicial: int,y_inicial:int ,ang_inicial:bool ,x_objetivo:int ,y_objetivo:int ,ang_objetivo:bool) -> None:
@@ -143,12 +145,10 @@ class Busqueda():
         if lista_palets != None:
             for palet in lista_palets:
 
-                c1 = abs(palet.x_objetivo-palet.pos_x) + abs(palet.y_objetivo-palet.pos_y)
+                c1 = 2*abs(palet.x_objetivo-palet.pos_x) + 2*abs(palet.y_objetivo-palet.pos_y)
 
-
-                #if palet.x_objetivo==palet.pos_x and palet.y_objetivo==palet.pos_y:
                 if palet.ang_actual != palet.ang_objetivo:
-                    c1 = 2*c1 + 1
+                    c1 = c1 + 10
 
                 coste = coste + c1
 
@@ -266,15 +266,25 @@ class Busqueda():
                 #print("GIRO ILEGAL")
                 return None
 
+            lista_palets_quietos: "list[Palet] " = []   
+            Palet_girado = None     #type:ignore
 
             for palet in lis_estanterias_copia:
 
                 # Gira el palet si es el que esta en la posicion del robot
                 if palet.pos_x == cord_robot_x and palet.pos_y == cord_robot_y:
-                    #print("GIRADO",cord_robot_x, " y ",cord_robot_y)
-                    #print("PALET EN X ",palet.pos_x, " y ",palet.pos_y, "PASA DE ", palet.ang_actual, "A ", not(palet.ang_actual))
 
-                    palet.ang_actual = not(palet.ang_actual)
+                    Pal_pos_x = palet.pos_x; Pal_obj_x = palet.x_objetivo
+                    Pal_pos_y = palet.pos_y; Pal_obj_y = palet.y_objetivo
+                    Pal_ang_act = not(palet.ang_actual); Pal_obj_ang = palet.ang_objetivo
+                    
+
+                    Palet_girado: Palet = Palet(Pal_pos_x,Pal_pos_y,Pal_ang_act,
+                                                Pal_obj_x,Pal_obj_y,Pal_obj_ang)
+                    if buscar_errores:
+                        print("GIRADO",cord_robot_x, " y ",cord_robot_y)
+                        print("PALET EN X ",palet.pos_x, " y ",palet.pos_y, "PASA DE ", palet.ang_actual, "A ", not(palet.ang_actual))
+
                     
 
 
@@ -286,9 +296,15 @@ class Busqueda():
                         for alto in range(-1,1):
                             if cord_robot_x == palet.pos_x +ancho and cord_robot_y == palet.pos_y + alto:
                                 return None
-                            
+                    lista_palets_quietos.append(palet)        
+                    
+            if Palet_girado != None:
+                lista_palets_quietos.append(Palet_girado)
 
-            estado_nuevo: Estado = Estado(cord_robot_x,cord_robot_y,robot_angulo,rob_activado,lis_estanterias_copia)
+                if buscar_errores:
+                    print("Estado nuevo giro palet")
+
+            estado_nuevo: Estado = Estado(cord_robot_x,cord_robot_y,robot_angulo,rob_activado,lista_palets_quietos)
             return estado_nuevo
 
 
@@ -540,6 +556,8 @@ class Busqueda():
 
                 coste_g: int = estado_sacado.costo_g                         
     
+                #print("Coste_g: ", coste_g)
+
                 if self.heuristica_total(estado_sacado) == 0:
                     Exito = True
                     print("Llegado al final en ciclo ", ciclos)
@@ -636,17 +654,17 @@ class Busqueda():
      
             # Imprimir los sucesores generados
             
-            #if Exito == False:
+            if buscar_errores and Exito == False:
                 #print(self.lis_abierta)
 
-                #print("Cantidad sucesores creados: ", len(sucesores))
-                #for s in sucesores:
-                    #if s != None :
-                        #print(s.accion)
-                        #print("Coste1 H abajo:", self.heuristica_total(s))
-                        #print("Coste1 G abajo:",s.costo_g)
+                print("Cantidad sucesores creados: ", len(sucesores))
+                for s in sucesores:
+                    if s != None :
+                        print(s.accion)
+                        print("Coste1 H abajo:", self.heuristica_total(s))
+                        print("Coste1 G abajo:",s.costo_g)
 
-                        #self.imprimir(s,self.entorno)
+                        self.imprimir(s,self.entorno)
             
             
             repetido:bool = False
@@ -719,7 +737,7 @@ class Busqueda():
 
 def main():
 
-    entornto_almacen = False
+    entornto_almacen = True
     
 
     if entornto_almacen:
@@ -743,27 +761,32 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=50000)
+        buscador.expandir(profundidad=500000)
 
 
     else:
         entorno = [
-            [0 ,0, 0],
-            [0 ,0, 0],
-            [0 ,0, 0],
-            [1 ,1, 1]
+            [0 ,0, 0, 0],
+            [0 ,0, 0, 0],
+            [0 ,0, 0, 0],
+            [0 ,0, 0, 0],
+            [0 ,0, 0, 0],
+            [0 ,0, 0, 0],
+            [0 ,0, 0, 0],
+           
+            
         ]
         
-        paletillos = [Palet(1,1,False,1,1,True)] 
+        paletillos = [Palet(5,1,True,2,1,False)] 
 
         situacion1 = Estado(0,0,"S",False,paletillos)
 
         buscador = Busqueda(situacion1,entorno)
 
-        debugging = True
+        debugging = False
 
         if debugging == False:
-            buscador.expandir(profundidad=5000000)
+            buscador.expandir(profundidad=50000)
         else:
 
             print("H Total inicial: ",buscador.heuristica_total(situacion1), "G: ",situacion1.costo_g)
