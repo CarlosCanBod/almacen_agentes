@@ -24,7 +24,7 @@ class Practica1:
 
     def execSearch(self):
         mundo_gazebo: int = 1
-		situacion1 = None
+        situacion1 = None
         camino_junto = None
 
         if mundo_gazebo == 0:
@@ -76,15 +76,12 @@ class Practica1:
                           pl.Palet(9,12,False,9,12,False),pl.Palet(7,12,False,7,12,False)
                           ]                             # Palets mas arriba
 
-	        situacion1 = pl.Estado(12,7,"N",False,paletillos)
+            situacion1 = pl.Estado(12,7,"N",False,paletillos)
 
 
-		if situacion1 != None:
-	        buscador = pl.Busqueda(situacion1,entorno)
-	
-	        camino_junto = buscador.expandir(profundidad=15000)
-
-
+        if situacion1 != None:
+            buscador = pl.Busqueda(situacion1,entorno)
+            camino_junto = buscador.expandir(profundidad=5000)
 
 
         if camino_junto != None:
