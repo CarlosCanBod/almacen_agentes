@@ -72,7 +72,7 @@ class Practica1:
             paletillos = [pl.Palet(9,3,False,9,3,False),pl.Palet(7,3,False,7,3,False), # Palets izquierda
                           pl.Palet(9,5,False,2,5,False),pl.Palet(7,5,False,7,5,False),
                           
-                          pl.Palet(9,10,False,9,10,False),pl.Palet(7,10,False,7,10,False), # Palets derecha
+                          pl.Palet(9,10,False,9,10,False),pl.Palet(7,10,False,1,7,True), # Palets derecha
                           pl.Palet(9,12,False,9,12,False),pl.Palet(7,12,False,7,12,False)
                           ]                             # Palets mas arriba
 
@@ -103,7 +103,7 @@ class Practica1:
                 else:
                     print("Instruccion: ",orden, " ignorada")
 
-                rospy.sleep(1)
+                #rospy.sleep(1)
         else:
             print("No encontrado camino")
 

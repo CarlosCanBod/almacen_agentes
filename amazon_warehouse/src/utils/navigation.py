@@ -9,6 +9,8 @@ from nav_msgs.msg import Odometry
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 
 
+v_angular: float = 0.2
+v_linear: float = 0.2
 
 class Obstacles():
 
@@ -124,7 +126,7 @@ class Navigation():
 
         # Down lift
         i = 0
-        while(i < 20):
+        while(i < 10):
             self.prismatic_publisher.publish(Float32(0.0))
             r.sleep()
             i = i + 1
@@ -183,16 +185,16 @@ class Navigation():
                             vel_msg.angular.z = -0.2
             else:
                 if movement == 0: # west
-                    if self.current_pose.y < goal_y: vel_msg.linear.x = 0.2
+                    if self.current_pose.y < goal_y: vel_msg.linear.x = v_linear
                     else: m = vel_msg.linear.x = -0.2
                 if movement == 1: # north
-                    if self.current_pose.x < goal_x: vel_msg.linear.x = 0.2
+                    if self.current_pose.x < goal_x: vel_msg.linear.x = v_linear
                     else: m = vel_msg.linear.x = -0.2
                 if movement == 2: # east
-                    if self.current_pose.y > goal_y: vel_msg.linear.x = 0.2
+                    if self.current_pose.y > goal_y: vel_msg.linear.x = v_linear
                     else: m = vel_msg.linear.x = -0.2
                 if movement == 3: # south
-                    if self.current_pose.x > goal_x: vel_msg.linear.x = 0.2
+                    if self.current_pose.x > goal_x: vel_msg.linear.x = v_linear
                     else: vel_msg.linear.x = -0.2
                 vel_msg.angular.z = 0.0
 
@@ -215,7 +217,7 @@ class Navigation():
         if target_rad > pi:
             target_rad -= 2*pi
         self.goal_pose.theta = target_rad
-        vel_msg.angular.z = -0.2
+        vel_msg.angular.z = -v_angular
         #print("target", target_rad, " current ", self.current_pose.theta)
         while abs(target_rad - self.current_pose.theta) > 0.05:
             self.velocity_publisher.publish(vel_msg)    
@@ -249,7 +251,7 @@ class Navigation():
             self.rotations = self.rotations - 1
 
         self.goal_pose.theta = target_rad
-        vel_msg.angular.z = 0.2
+        vel_msg.angular.z = v_angular
         #print("target", target_rad, " current ", self.current_pose.theta)
         while abs(target_rad - self.current_pose.theta) > 0.05:
             self.velocity_publisher.publish(vel_msg)    
