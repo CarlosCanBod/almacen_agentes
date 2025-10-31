@@ -19,7 +19,17 @@ find_package (gazebo REQUIRED)
 
 catkin_package(
   #INCLUDE_DIRS include
+  LIBRARIES amazon_warehouse
   CATKIN_DEPENDS gazebo_plugins gazebo_ros roscpp
+)
+
+catkin_install_python(PROGRAMS
+  scripts/Class_colas_prioridad.py 
+  scripts/Planificador.py 
+  src/utils/obstacles.py
+  src/utils/navigation.py
+
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
 
@@ -38,6 +48,15 @@ include_directories( ${catkin_INCLUDE_DIRS}
 
 add_library(${PROJECT_NAME} plugin/gazebo_ros_screw_plugin.cpp)
 
+install(DIRECTORY src/amazon_warehouse/utils/
+  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/my_package
+)
+
+install(DIRECTORY src/amazon_warehouse/scripts/
+  DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}/my_package
+)
+
 
 ## Specify libraries to link a library or executable target against
 #target_link_libraries( ${PROJECT_NAME} ${catkin_LIBRARIES} ${GAZEBO_LIBRARIES} CameraPlugin )
+

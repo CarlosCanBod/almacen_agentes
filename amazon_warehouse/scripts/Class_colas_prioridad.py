@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 from typing import Any
 
 #Cada elemento/nodo de la lista enlazada 
