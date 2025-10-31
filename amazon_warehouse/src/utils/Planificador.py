@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 from typing import Any
+from time import time
 import numpy as np  # Se usa para copiar el entorno para el mapa.
 
 
@@ -709,6 +710,10 @@ class Busqueda():
         estado_sacado = None    #type: ignore
         coste_sacado = 0
         camino_hecho = None
+        self.nodos_expandidos: int = 0
+        self.tiempo_total: float = 0.0
+
+        tiempo_inicio = time()
 
 
         print("INICIAL DIBUJO", self.estado_ini.Lista_estanterias[0].ang_actual)
@@ -800,7 +805,8 @@ class Busqueda():
 
                     sucesores.append(estado_avance)
                     self.lis_abierta.insertar(dato=estado_avance,prioridad=coste_f_nuevo)
-                
+                    self.nodos_expandidos += 1
+
                 
                 estado_gir_der: Estado = self.girar(estado_sacado,False)
                 if estado_gir_der != None:
@@ -817,7 +823,7 @@ class Busqueda():
 
                     sucesores.append(estado_gir_der)
                     self.lis_abierta.insertar(dato=estado_gir_der,prioridad=coste_f_nuevo)
-                
+                    self.nodos_expandidos += 1
 
 
                 estado_gir_izq: Estado = self.girar(estado_sacado,True)
@@ -835,7 +841,7 @@ class Busqueda():
 
                     sucesores.append(estado_gir_izq)
                     self.lis_abierta.insertar(dato=estado_gir_izq,prioridad=coste_f_nuevo)
-            
+                    self.nodos_expandidos += 1
 
                 estado_levantar: Estado = self.levantar_bajar(estado_sacado)
                 if estado_levantar != None:
@@ -850,11 +856,9 @@ class Busqueda():
                     else: # Se sube el palet 
                         estado_levantar.asignar_padre(estado_sacado,coste_g1,"S")
 
-
-
                     sucesores.append(estado_levantar)
                     self.lis_abierta.insertar(dato=estado_levantar,prioridad=coste_f_nuevo)
-
+                    self.nodos_expandidos += 1
 
      
             # Imprimir los sucesores generados
@@ -882,6 +886,9 @@ class Busqueda():
             print("Error, no se encontro solucion")
 
         print("Exito: ", Exito)
+
+        self.tiempo_total = time() - tiempo_inicio
+
         return camino_hecho
 
 

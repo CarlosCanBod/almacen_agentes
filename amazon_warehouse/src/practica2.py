@@ -86,6 +86,7 @@ class Practica1:
 
         if camino_junto != None:
             camino_pasos = camino_junto.split(".")
+            longitud_plan: int = len(camino_pasos) -1 # resta el paso inicio que no es real
 
             for orden in camino_pasos:
                 print("Instruccion: ",orden)
