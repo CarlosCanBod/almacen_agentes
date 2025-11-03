@@ -23,7 +23,7 @@ class Practica1:
      
 
     def execSearch(self):
-        mundo_gazebo: int = 1
+        mundo_gazebo: int = 0
         situacion1 = None
         camino_junto = None
 

@@ -195,7 +195,7 @@ class Busqueda():
     
 
 
-        coste_total = 10*coste_palets_objetivo + coste_robot_origen + 10*coste_palets_robot
+        coste_total = 10*coste_palets_objetivo + coste_robot_origen + 5*coste_palets_robot
 
         return coste_total
     
@@ -741,8 +741,9 @@ def main():
 
     entornto_almacen = True
     
+    mundo_simulado = 0
 
-    if entornto_almacen and buscar_errores == False:
+    if mundo_simulado == 0 and buscar_errores == False:
         entorno = [
             [0, 1, 1, 1, 1, 1, 1, 0],
             [0, 1, 0, 0, 0, 0, 1, 0],
@@ -764,6 +765,9 @@ def main():
         buscador = Busqueda(situacion1,entorno)
 
         buscador.expandir(profundidad=500000)
+
+
+   
 
 
     else:
@@ -835,6 +839,8 @@ def main():
             a1 = buscador.girar(a1)
             print("H Total: ",buscador.heuristica_total(a1), "G: ",a1.costo_g)
             buscador.imprimir(a1,entorno)
+
+
 
     return None
 
