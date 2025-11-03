@@ -313,7 +313,10 @@ class Busqueda():
 
         self.entorno = entorno
 
+        self.coste_final:int = 0
         self.longitud_camino: int = 0
+        self.tiempo_total: float = 0.0
+        self.nodos_expandidos: int = 0
 
         #self.lis_abierta: "list[Estado]" = [estado_inicial]
         self.lis_cerrada: "list[nodo_cola_prioridad]" = []
@@ -395,7 +398,7 @@ class Busqueda():
             if modo_djistra == False:
                 coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
     
-        coste_total = 3*coste_palets_objetivo + 2*coste_robot_origen + 5*coste_palets_robot
+        coste_total = 4*coste_palets_objetivo + 2*coste_robot_origen + 3*coste_palets_robot
 
         if modo_djistra:
             if coste_total != 0:
@@ -462,10 +465,15 @@ class Busqueda():
             # Que no este cerca de algun obstaculo 
             # Los obstaculos tienen valor 9 en entorno, y paredes 1 por ejemplo
             # No pueden girar si tienen bloque, pero si pared cerca
-            for ancho in range(-1,1):
-                for alto in range(-1,1):
+            for ancho in range(-1,2):
+                for alto in range(-1,2):
+                    #if ancho == 1 and alto == 0:
+                    #    print("ENTORNO AL SUR: ", self.entorno[cord_robot_x +ancho][cord_robot_y+alto])
+                    #print(ancho)
                     if self.entorno[cord_robot_x +ancho][cord_robot_y + alto] == 9:
                         return None
+                    
+
 
             # Que no pueda girar en los bordes con palet
             # REVISAR QUE NO ELIMINE CAMINOS CORRECTOS
@@ -969,16 +977,16 @@ def main():
 
     if mundo_simulado == 0 and buscar_errores == False:
         print("Mundo 0")
-        #Mundo 0 coste G  62  Ciclo 5920 Heuristica 2* 1* 10*
-        #Mundo 0 coste G  62  Ciclo 2879 Heuristica 3* 1* 50*
         #Mundo 0 coste G  72  Ciclo 807  Heuristica 10* 1* 10*
         #Mundo 0 coste G  72(l 40)  Ciclo 519  Heuristica 10* 2* 10* tiempo 0.23 expandido 894
-        #Mundo 0 coste G  62  Ciclo 2369  Heuristica 3* 2* 10*
         #Mundo 0 coste G  66  Ciclo 1940  Heuristica 4* 2* 10*
-        #Mundo 0 coste G  62  Ciclo 3188  Heuristica 3* 2* 5*
-        #Mundo 0 coste G  62  Ciclo 3188  Heuristica 3* 2* 40*
-        #Mundo 0 coste G  62(l 36) Ciclo 6081  Heuristica 3* 2* 1* tiempo 21 expandido 9409
 
+        #ARREGLADO ERROR GIRO, DETECTA OBSTACULOS ARRIBA Y ABAJO
+        #Mundo 0 coste G  66(l 38)  Ciclo 5060 Heuristica 3* 2* 5*
+        #Mundo 0 coste G  72(l 40)  Ciclo 519  Heuristica 10* 2* 10* tiempo 0.23 expandido 894
+        #Mundo 0 coste G  66(l 38)  Ciclo 1940 Heuristica 4* 2* 10* tiempo expandido 3183
+        #Mundo 0 coste G  72(l 40) Ciclo 351 Heuristica 6* 3* 8* tiempo 0.15 expandido 740
+        #Mundo 0 coste G  66(l 38)  Ciclo 3369 Heuristica 4* 2* 3* tiempo expandido 5335
 
 
         entorno = [
@@ -1010,7 +1018,10 @@ def main():
         #Mundo 1 coste G  NADA  Ciclo 20000 Heuristica 3*1*2    tiempo 1080 expandido 32758
         #Mundo 1 coste G  137 (l 76) Ciclo 1863 Heuristica 10* 2* 10*   tiempo 8.4  expandido 3235
         #Mundo 1 coste G  NADA (l ) Ciclo 20000 Heuristica 10* 2* 0*   tiempo 470 expandido 26219
-        #Mundo 1 coste G  NADA Ciclo 20000  Heuristica 3* 2* 1* tiempo  expandido 32713
+        #Mundo 1 coste G  NADA Ciclo 20000  Heuristica 3* 2* 1* tiempo  expandido 32713 
+        # ARREGLADO FALLO GIRO
+        #Mundo 1 coste G  NADA Ciclo 10000  Heuristica 4* 2* 10* tiempo 195 expandido 16215
+        #Mundo 1 coste G  137(l 76) Ciclo 3708 Heuristica 6* 3* 8* tiempo 33 expandido 6455
 
 
         entorno = [
@@ -1046,41 +1057,21 @@ def main():
 
         buscador.expandir(profundidad=10000)
 
-    elif mundo_simulado == 2:
-        print("Mundo 2")
-        # 
+    elif mundo_simulado == 10:
         entorno = [
-        #Y0                                           #Y14
-            [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],  #X 0
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-            [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
-            [1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],  #X 9
-            [1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1],
-            [1, 1, 1, 1, 1, 1, 0, 0, 0, 1, 1, 1, 1, 1, 1],  
-            [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],
-            [0, 0, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0],  
-            [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0]   #X 14
-            ]
+            [1, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 1],
+            [1, 0, 0, 9, 9, 9, 1],
+        ]
 
-        
-        paletillos = [Palet(9,3,False,9,3,False),Palet(7,3,False,7,3,False), # Palets izquierda
-                     Palet(9,5,False,2,5,False),Palet(7,5,False,7,5,False),
-                          
-                        Palet(9,10,False,9,10,False),Palet(7,10,False,1,7,True), # Palets derecha
-                        Palet(9,12,False,9,12,False),Palet(7,12,False,7,12,False)
-                          ]                             # Palets mas arriba
-
-        situacion1 = Estado(12,7,"N",False,paletillos)
+        paletillos = [Palet(1,3,True,1,5,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
+        situacion1 = Estado(1,3,"E",True,paletillos)
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=500000)
+        sit2 = buscador.girar(situacion1,False)
+
+        buscador.imprimir(sit2,entorno)
 
 
     if buscador != None:
