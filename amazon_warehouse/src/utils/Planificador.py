@@ -397,8 +397,9 @@ class Busqueda():
             # Que el robot quiera ir a por los palets que tienen que moverse
             if modo_djistra == False:
                 coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
-    
-        coste_total = 4*coste_palets_objetivo + 2*coste_robot_origen + 3*coste_palets_robot
+                
+
+        coste_total = 2*coste_palets_objetivo + 1*coste_robot_origen + 1*coste_palets_robot
 
         if modo_djistra:
             if coste_total != 0:
@@ -470,10 +471,11 @@ class Busqueda():
                     #if ancho == 1 and alto == 0:
                     #    print("ENTORNO AL SUR: ", self.entorno[cord_robot_x +ancho][cord_robot_y+alto])
                     #print(ancho)
-                    if self.entorno[cord_robot_x +ancho][cord_robot_y + alto] == 9:
-                        return None
-                    
-
+                    try:
+                        if self.entorno[cord_robot_x +ancho][cord_robot_y + alto] == 9:
+                            return None
+                    except:
+                        pass
 
             # Que no pueda girar en los bordes con palet
             # REVISAR QUE NO ELIMINE CAMINOS CORRECTOS
@@ -720,7 +722,7 @@ class Busqueda():
 
     def expandir(self,profundidad= 100):
         
-        factor_g: int = 2
+        factor_g: int =1
 
         ciclos = 0
         Exito = False
@@ -742,6 +744,7 @@ class Busqueda():
 
             repetido:bool = False
             sucesores: "list[Estado]" =[]
+
 
             estado_coste = self.lis_abierta.extraer()
 
@@ -766,6 +769,7 @@ class Busqueda():
 
             if ciclos%100 == 0:
                 print("Profundidad: ",ciclos)
+                
 
             ciclos = ciclos+1
             coste_g = 0
@@ -774,7 +778,6 @@ class Busqueda():
 
                 self.lis_cerrada.append(estado_coste)
                 c_h = self.heuristica_total(estado_sacado)
-
                 coste_g: int = estado_sacado.costo_g                         
     
                 if c_h == 0:
@@ -809,6 +812,7 @@ class Busqueda():
                 hacer bucle  o algo asi.
                 
                 """
+                #tiempo_in_expandir = time()
                 estado_avance: Estado = self.avanzar(estado_sacado)
                 if estado_avance != None:
                     coste_h = self.heuristica_total(estado_avance)
@@ -878,7 +882,7 @@ class Busqueda():
                     self.lis_abierta.insertar(dato=estado_levantar,prioridad=coste_f_nuevo)
                     self.nodos_expandidos += 1
 
-     
+                #print("Tiempo expandir: ", time() - tiempo_in_expandir)
             # Imprimir los sucesores generados
             
             if buscar_errores and Exito == False:
@@ -971,7 +975,7 @@ class Busqueda():
         return None
 
 def main():
-    mundo_simulado = 0
+    mundo_simulado = 2
     buscador = None
     camino = 0
 
@@ -987,6 +991,7 @@ def main():
         #Mundo 0 coste G  66(l 38)  Ciclo 1940 Heuristica 4* 2* 10* tiempo expandido 3183
         #Mundo 0 coste G  72(l 40) Ciclo 351 Heuristica 6* 3* 8* tiempo 0.15 expandido 740
         #Mundo 0 coste G  66(l 38)  Ciclo 3369 Heuristica 4* 2* 3* tiempo expandido 5335
+        #Mundo 2 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 6 expandido 6255 
 
 
         entorno = [
@@ -1009,7 +1014,7 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        camino = buscador.expandir(profundidad=10000)
+        camino = buscador.expandir(profundidad=5000)
 
     elif mundo_simulado == 1:
         print("Mundo 1")
@@ -1022,6 +1027,7 @@ def main():
         # ARREGLADO FALLO GIRO
         #Mundo 1 coste G  NADA Ciclo 10000  Heuristica 4* 2* 10* tiempo 195 expandido 16215
         #Mundo 1 coste G  137(l 76) Ciclo 3708 Heuristica 6* 3* 8* tiempo 33 expandido 6455
+        #Mundo 1 coste G  (l ) Ciclo  Heuristica 4* 2* 3* tiempo  expandido 
 
 
         entorno = [
@@ -1055,7 +1061,29 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=10000)
+        buscador.expandir(profundidad=5000)
+    elif mundo_simulado == 2:
+        print("Mundo 2")
+        # Mundo 2 coste G 58(l 36) Ciclo 13507 Heuristica 2* 1* 0* tiempo 47 expandido 16771
+        # Mundo 2 coste G 58(l 36) Ciclo 5288 Heuristica 2* 1* 1* tiempo 8 expandido 7265 
+        # Mundo 2 coste G 58(l 36) Ciclo 1757 Heuristica 5* 1* 1* tiempo 1 expandido 2525
+
+        entorno = [
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0],
+            [0, 0, 0, 0, 0, 0, 0]
+        ]
+
+        paletillos = [Palet(4,1,True,1,1,True),Palet(4,5,True,1,5,True)] 
+        situacion1 = Estado(0,3,"E",False,paletillos)
+
+        buscador = Busqueda(situacion1,entorno)
+
+        buscador.expandir(profundidad=20000)
+
+
 
     elif mundo_simulado == 10:
         entorno = [
