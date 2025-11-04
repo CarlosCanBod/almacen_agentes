@@ -53,6 +53,27 @@ class cola_prio():
 
             return "Error imprimir cola prioridad"
 
+
+    def __len__(self):
+        if self.cabeza != None:
+            nodo_actual = self.cabeza
+            tamano = 0;
+            while nodo_actual.siguiente != None:
+                nodo_actual = nodo_actual.siguiente
+                tamano += 1
+
+            tamano += 1
+            return tamano
+        else:
+            return 0
+
+    def valor_cabeza(self) -> Any:
+        if self.cabeza != None:
+            return self.cabeza.prioridad
+        else:
+            return None
+
+
     #Introduce el elemento en la lista y su posicion depende de su prioridad
     #Cuanta mas prioridad mas a la derecha se va a colocar. 
     def insertar(self,dato: Any,prioridad: int):
@@ -160,23 +181,6 @@ class cola_prio():
         else:
             return 0
         
-
-
-    def __len__(self):
-        if self.cabeza != None:
-            nodo_actual = self.cabeza
-            tamano = 0;
-            while nodo_actual.siguiente != None:
-                nodo_actual = nodo_actual.siguiente
-                tamano += 1
-
-            tamano += 1
-            return tamano
-        else:
-            return 0
-   
-
-
     #Devuelve el elemento con mas prioridad y lo borra de la cola
     def extraer(self):
         if self.cabeza != None:
@@ -198,6 +202,10 @@ class cola_prio():
         else:
             pass
 
+"""
+Fin clases de cola prioridad
+
+"""
 
 buscar_errores: bool = False
 
@@ -318,10 +326,16 @@ class Busqueda():
         self.tiempo_total: float = 0.0
         self.nodos_expandidos: int = 0
 
-        #self.lis_abierta: "list[Estado]" = [estado_inicial]
         self.lis_cerrada: "list[nodo_cola_prioridad]" = []
 
+
         self.lis_abierta = cola_prio()    
+
+        # Aqui se van a meter los nodos si su coste es mayor al de la cabeza de lista abierta,
+        # a ver si hace que vaya mas rapido el codigo, ya que lo que hace que se vaya mas lento 
+        # es meter nuevos estados en lista abierta cuando ya hay muchos.
+        self.lis_abierta_lenta: cola_prio = cola_prio()
+
 
         self.lis_abierta.insertar(estado_inicial,prioridad=self.heuristica_total(estado_inicial))
 
@@ -727,7 +741,7 @@ class Busqueda():
         ciclos = 0
         Exito = False
         estado_sacado = None    #type: ignore
-        coste_sacado = 0
+        estado_coste = None  #type: ignore
         camino_hecho = None
         self.nodos_expandidos: int = 0
         self.tiempo_total: float = 0.0
@@ -746,35 +760,39 @@ class Busqueda():
             sucesores: "list[Estado]" =[]
 
 
-            estado_coste = self.lis_abierta.extraer()
+
+            if self.lis_abierta.vacio() == False:
+                estado_coste = self.lis_abierta.extraer()
+            else:
+                #estado_coste = self.lis_abierta_lenta.extraer()
+
+                #estado_coste_aux = self.lis_abierta_lenta.extraer()
+                #if estado_coste_aux != None:
+                #    self.lis_abierta.insertar(estado_coste_aux.dato,estado_coste_aux.prioridad)
+            
+                self.lis_abierta = self.lis_abierta_lenta
+                self.lis_abierta_lenta = cola_prio()
+
+                estado_coste = self.lis_abierta.extraer()
+
 
             if estado_coste == None:
                 break
+           #print("Valor cabeza lista abierta: ", self.lis_abierta.valor_cabeza())
 
             estado_sacado: Estado = estado_coste.dato
-            coste_sacado: int = estado_coste.prioridad
-
-            """
-            No funciona con varios palets en la lista, cambiar o quitar
-            if estado_sacado.Robot_activado:
-                estanteria = estado_sacado.Lista_estanterias[0]
-                if estado_sacado.Robot_x != estanteria.pos_x:
-                    print("ROBOT LEVANTADO ILEGAL")
-                    exit()
-                if estado_sacado.Robot_y != estanteria.pos_y:
-                    print("ROBOT LEVANTADO ILEGAL")
-                    exit()
-            """
 
 
             if ciclos%100 == 0:
-                print("Profundidad: ",ciclos)
+                print("Ciclos: ", ciclos)
                 
 
             ciclos = ciclos+1
             coste_g = 0
 
             if estado_coste not in self.lis_cerrada:
+
+
 
                 self.lis_cerrada.append(estado_coste)
                 c_h = self.heuristica_total(estado_sacado)
@@ -811,7 +829,11 @@ class Busqueda():
                 Pendiente hacer que haga bastantes distancias,
                 hacer bucle  o algo asi.
                 
-                """
+                """                
+                
+                valor_cabeza = 999999 #self.lis_abierta.valor_cabeza()
+
+
                 #tiempo_in_expandir = time()
                 estado_avance: Estado = self.avanzar(estado_sacado)
                 if estado_avance != None:
@@ -820,13 +842,21 @@ class Busqueda():
                         coste_g1 = coste_g + 2
                     else:
                         coste_g1 = coste_g + 1 
-
+                        
                     coste_f_nuevo = coste_h + coste_g1*factor_g
 
                     estado_avance.asignar_padre(estado_sacado,coste_g1,"A")
 
                     sucesores.append(estado_avance)
-                    self.lis_abierta.insertar(dato=estado_avance,prioridad=coste_f_nuevo)
+
+                    if  valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
+                        #print("Metido en lista abierta ")
+                        self.lis_abierta.insertar(dato=estado_avance,prioridad=coste_f_nuevo)
+                    else:
+                        #print("Metido en lista abierta2 ")
+
+                        self.lis_abierta_lenta.insertar(dato=estado_avance,prioridad=coste_f_nuevo)
+
                     self.nodos_expandidos += 1
 
                 
@@ -844,7 +874,12 @@ class Busqueda():
                     estado_gir_der.asignar_padre(estado_sacado,coste_g1,"GD")
 
                     sucesores.append(estado_gir_der)
-                    self.lis_abierta.insertar(dato=estado_gir_der,prioridad=coste_f_nuevo)
+
+                    if valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
+                        self.lis_abierta.insertar(dato=estado_gir_der,prioridad=coste_f_nuevo)
+                    else:
+                        self.lis_abierta_lenta.insertar(dato=estado_gir_der,prioridad=coste_f_nuevo)
+                    
                     self.nodos_expandidos += 1
 
 
@@ -862,8 +897,13 @@ class Busqueda():
                     estado_gir_izq.asignar_padre(estado_sacado,coste_g1,"GI")
 
                     sucesores.append(estado_gir_izq)
-                    self.lis_abierta.insertar(dato=estado_gir_izq,prioridad=coste_f_nuevo)
+
+                    if valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
+                        self.lis_abierta.insertar(dato=estado_gir_izq,prioridad=coste_f_nuevo)
+                    else:
+                        self.lis_abierta_lenta.insertar(dato=estado_gir_izq,prioridad=coste_f_nuevo)
                     self.nodos_expandidos += 1
+
 
                 estado_levantar: Estado = self.levantar_bajar(estado_sacado)
                 if estado_levantar != None:
@@ -879,7 +919,12 @@ class Busqueda():
                         estado_levantar.asignar_padre(estado_sacado,coste_g1,"S")
 
                     sucesores.append(estado_levantar)
-                    self.lis_abierta.insertar(dato=estado_levantar,prioridad=coste_f_nuevo)
+
+                    if valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
+                        self.lis_abierta.insertar(dato=estado_levantar,prioridad=coste_f_nuevo)
+                    else:
+                        self.lis_abierta_lenta.insertar(dato=estado_levantar,prioridad=coste_f_nuevo)
+
                     self.nodos_expandidos += 1
 
                 #print("Tiempo expandir: ", time() - tiempo_in_expandir)
@@ -900,7 +945,7 @@ class Busqueda():
             
             repetido:bool = False
 
-            if self.lis_abierta.vacio():
+            if self.lis_abierta_lenta.vacio() and self.lis_abierta.vacio():
                 break
 
 
@@ -1028,7 +1073,7 @@ def main():
         #Mundo 1 coste G  NADA Ciclo 10000  Heuristica 4* 2* 10* tiempo 195 expandido 16215
         #Mundo 1 coste G  137(l 76) Ciclo 3708 Heuristica 6* 3* 8* tiempo 33 expandido 6455
         #Mundo 1 coste G  (l ) Ciclo  Heuristica 4* 2* 3* tiempo  expandido 
-
+        #Mundo 1 coste G (l ) Ciclo  Heuristica 2* 1* 1 tiempo  expandido 
 
         entorno = [
         #Y0                                           #Y14
@@ -1061,7 +1106,7 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=5000)
+        buscador.expandir(profundidad=500000)
     elif mundo_simulado == 2:
         print("Mundo 2")
         # Mundo 2 coste G 58(l 36) Ciclo 13507 Heuristica 2* 1* 0* tiempo 47 expandido 16771
