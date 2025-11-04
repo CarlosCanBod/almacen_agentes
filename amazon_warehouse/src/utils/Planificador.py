@@ -760,23 +760,26 @@ class Busqueda():
             sucesores: "list[Estado]" =[]
 
 
+            valor_cabeza = self.lis_abierta.valor_cabeza()
 
             if self.lis_abierta.vacio() == False:
                 estado_coste = self.lis_abierta.extraer()
             else:
-                #estado_coste = self.lis_abierta_lenta.extraer()
+                # Si lista abierta esta vacia, se meten todos los datos de la lista lenta
+                print("Metiendo nodos lista lenta a abierta")
 
-                #estado_coste_aux = self.lis_abierta_lenta.extraer()
-                #if estado_coste_aux != None:
-                #    self.lis_abierta.insertar(estado_coste_aux.dato,estado_coste_aux.prioridad)
-            
-                self.lis_abierta = self.lis_abierta_lenta
-                self.lis_abierta_lenta = cola_prio()
+                while self.lis_abierta_lenta.vacio() == False:
+                    estado_coste_aux = self.lis_abierta_lenta.extraer()
+
+                    if estado_coste_aux != None:
+                        self.lis_abierta.insertar(estado_coste_aux.dato,estado_coste_aux.prioridad)
+                    else:break
 
                 estado_coste = self.lis_abierta.extraer()
 
 
             if estado_coste == None:
+                print("Lista abierta vacia, no hay mas estados que expandir")
                 break
            #print("Valor cabeza lista abierta: ", self.lis_abierta.valor_cabeza())
 
@@ -831,7 +834,6 @@ class Busqueda():
                 
                 """                
                 
-                valor_cabeza = 999999 #self.lis_abierta.valor_cabeza()
 
 
                 #tiempo_in_expandir = time()
@@ -1020,7 +1022,7 @@ class Busqueda():
         return None
 
 def main():
-    mundo_simulado = 2
+    mundo_simulado =1
     buscador = None
     camino = 0
 
@@ -1036,7 +1038,13 @@ def main():
         #Mundo 0 coste G  66(l 38)  Ciclo 1940 Heuristica 4* 2* 10* tiempo expandido 3183
         #Mundo 0 coste G  72(l 40) Ciclo 351 Heuristica 6* 3* 8* tiempo 0.15 expandido 740
         #Mundo 0 coste G  66(l 38)  Ciclo 3369 Heuristica 4* 2* 3* tiempo expandido 5335
-        #Mundo 2 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 6 expandido 6255 
+        #Mundo 0 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 6 expandido 6255 
+
+        # Lista abierta prototipo 
+        #Mundo 0 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 3.8 expandido 6255 
+        # Con valor cabeza 9999   
+        # #Mundo 0 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 5.33 expandido 6255 
+
 
 
         entorno = [
@@ -1073,7 +1081,10 @@ def main():
         #Mundo 1 coste G  NADA Ciclo 10000  Heuristica 4* 2* 10* tiempo 195 expandido 16215
         #Mundo 1 coste G  137(l 76) Ciclo 3708 Heuristica 6* 3* 8* tiempo 33 expandido 6455
         #Mundo 1 coste G  (l ) Ciclo  Heuristica 4* 2* 3* tiempo  expandido 
-        #Mundo 1 coste G (l ) Ciclo  Heuristica 2* 1* 1 tiempo  expandido 
+
+        # Lista abierta prototipo
+        #Mundo 1 coste G NADA(l ) Ciclo 10000 Heuristica 2* 1* 1 tiempo 105 expandido 
+
 
         entorno = [
         #Y0                                           #Y14
@@ -1106,12 +1117,18 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=500000)
+        buscador.expandir(profundidad=10000)
     elif mundo_simulado == 2:
         print("Mundo 2")
         # Mundo 2 coste G 58(l 36) Ciclo 13507 Heuristica 2* 1* 0* tiempo 47 expandido 16771
         # Mundo 2 coste G 58(l 36) Ciclo 5288 Heuristica 2* 1* 1* tiempo 8 expandido 7265 
         # Mundo 2 coste G 58(l 36) Ciclo 1757 Heuristica 5* 1* 1* tiempo 1 expandido 2525
+
+
+        # Lista abierta prototipo 
+        #Mundo 2 coste G 58(l 36) Ciclo 5288 Heuristica 2* 1* 1* tiempo 7.2 expandido 7265 
+        # Con valor cabeza 9999   
+       #Mundo 2 coste G 58(l 36) Ciclo 5288 Heuristica 2* 1* 1* tiempo 7.57 expandido 7265
 
         entorno = [
             [0, 0, 0, 0, 0, 0, 0],
