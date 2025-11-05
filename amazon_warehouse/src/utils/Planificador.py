@@ -1037,7 +1037,7 @@ class Busqueda():
         return None
 
 def main():
-    mundo_simulado = 1
+    mundo_simulado = 2
     buscador = None
     camino = 0
 
@@ -1134,7 +1134,7 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=1000)
+        buscador.expandir(profundidad=10000)
     elif mundo_simulado == 2:
         print("Mundo 2")
         # Mundo 2 coste G 58(l 36) Ciclo 13507 Heuristica 2* 1* 0* tiempo 47 expandido 16771
