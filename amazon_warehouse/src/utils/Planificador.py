@@ -766,7 +766,8 @@ class Busqueda():
                 estado_coste = self.lis_abierta.extraer()
             else:
                 # Si lista abierta esta vacia, se meten todos los datos de la lista lenta
-                print("Metiendo nodos lista lenta a abierta")
+                print("Metiendo nodos lista lenta a abierta en ciclo ", ciclos)
+
                 """
                 while self.lis_abierta_lenta.vacio() == False:
                     estado_coste_aux = self.lis_abierta_lenta.extraer()
@@ -779,6 +780,7 @@ class Busqueda():
                 self.lis_abierta_lenta = cola_prio()
 
                 estado_coste = self.lis_abierta.extraer()
+
 
 
             if estado_coste == None:
@@ -1132,7 +1134,7 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=2000)
+        buscador.expandir(profundidad=1000)
     elif mundo_simulado == 2:
         print("Mundo 2")
         # Mundo 2 coste G 58(l 36) Ciclo 13507 Heuristica 2* 1* 0* tiempo 47 expandido 16771
