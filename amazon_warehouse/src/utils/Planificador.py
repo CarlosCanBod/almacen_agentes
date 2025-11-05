@@ -3,6 +3,9 @@ from typing import Any
 from time import time
 import numpy as np  # Se usa para copiar el entorno para el mapa.
 import matplotlib.pyplot as plt
+import psutil   # para ver consumo de memoria
+import tracemalloc
+
 
 from typing import Any
 
@@ -328,6 +331,7 @@ class Busqueda():
         self.tiempo_total: float = 0.0
         self.nodos_expandidos: int = 0
         self.lis_tiempo_ciclo: "list[float]" = []
+        self.lis_memoria_ciclo: "list[float]" = []
 
 
         #self.lis_cerrada: "list[nodo_cola_prioridad]" = []
@@ -545,8 +549,6 @@ class Busqueda():
             estado_nuevo: Estado = Estado(cord_robot_x,cord_robot_y,robot_angulo,rob_activado,lista_palets_quietos)
             return estado_nuevo
 
-
-
     def avanzar(self, estado: Estado) -> Any:
 
         Rob_pos_x = estado.Robot_x
@@ -751,7 +753,8 @@ class Busqueda():
                 return None
             else:
                 self.lis_cerrada.pop(estado_nuevo)  # Borrar de lista cerrada el estado viejo
-                
+                                                    # para hacer dic mas pequeño, alomejor no se deberia hacer
+                                                    # porque hasta que no se meta el otro se podrian repetir estados
 
         if  valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
             #print("Metido en lista abierta ")
@@ -857,8 +860,10 @@ class Busqueda():
                     self.nodos_expandidos += 1
 
 
-    def resolver(self,profundidad= 100):
-        
+    def resolver(self,profundidad= 100,medir_memoria: bool = False):
+
+        if medir_memoria:
+            tracemalloc.start()    
 
         ciclos = 0
         Exito = False
@@ -878,6 +883,10 @@ class Busqueda():
 
         while  (profundidad > ciclos) and Exito == False:
             tiempo_inicio_bucle = time()
+            #self.lis_memoria_ciclo.append(psutil.virtual_memory().used / (1024 * 1024))  # Memoria en MB
+            if medir_memoria:
+                mem = tracemalloc.get_traced_memory()[0]
+                self.lis_memoria_ciclo.append(mem)
 
             repetido:bool = False
             sucesores: "list[Estado]" =[]
@@ -903,7 +912,10 @@ class Busqueda():
 
             if ciclos%100 == 0:
                 print("Ciclos: ", ciclos)
-                
+
+            
+
+
             ciclos = ciclos+1
             coste_g = 0
 
@@ -955,6 +967,8 @@ class Busqueda():
             camino_pasos = camino_hecho.split(".")            #type: ignore
             self.longitud_camino: int = len(camino_pasos) -1   #resta el paso inicio que no es real
 
+        if medir_memoria:
+            tracemalloc.stop()
         return camino_hecho
 
 

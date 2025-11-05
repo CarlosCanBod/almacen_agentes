@@ -100,7 +100,7 @@ def cargar_estados() -> list[Estado]:
 
 def main():
     buscador = None
-    camino = 0
+    medir_memoria = False
 
     lista_entornos = cargar_entornos()
     situaciones = cargar_estados()
@@ -118,13 +118,15 @@ def main():
         pesos_h = [5,1,2]
         buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
 
-        buscador.resolver(profundidad=25000)
+        buscador.resolver(profundidad=25000,medir_memoria= medir_memoria)
 
         if buscador != None:
             lista_tiempos = buscador.lis_tiempo_ciclo
             tiempo_medio = sum(lista_tiempos)/len(lista_tiempos)
             with open("PRUEBA_BORRAR.txt","a") as w:
                 w.writelines("Mundo: " + str(i) + "\n")
+                if medir_memoria:
+                    w.writelines("Midiendo uso memoria \n")
                 w.writelines("Pesos: " + str(pesos_h) + "\n")
                 w.writelines("Tiempo total calculo: " + str(buscador.tiempo_total)+ "\n")
                 w.writelines("Coste total camino: " + str(buscador.coste_final)+ "\n")
@@ -146,7 +148,13 @@ def main():
             print("Tiempo medio ciclo: ", tiempo_medio)
 
             #plt.plot(lista_tiempos)
-            #plt.show()
+            if medir_memoria:
+                plt.plot(buscador.lis_memoria_ciclo)
+                plt.xlabel("Ciclos")
+                plt.ylabel("Memoria usada")
+                plt.title("Consumo de memoria en busqueda - Mundo " + str(i))
+                plt.show()
+
 
 
     return None
