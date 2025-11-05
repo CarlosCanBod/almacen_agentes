@@ -371,7 +371,7 @@ class Busqueda():
                 c1 = abs(palet.x_objetivo-palet.pos_x) + abs(palet.y_objetivo-palet.pos_y)
 
                 if palet.ang_actual != palet.ang_objetivo:
-                    c1 = c1 + 3
+                    c1 = c1 + 1
 
                 coste = coste + c1
 

@@ -41,7 +41,37 @@ def cargar_entornos() -> list[list[list[int]]]:
             [0, 0, 0, 0, 0, 0, 0]
         ]
 
-    return [entorno0,entorno1,entorno2]
+    entorno3 = [
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [9, 9, 9, 9, 0, 9, 9, 9, 9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,9 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,9 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 9, 9, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0]    
+        ]
+
+
+
+
+    return [entorno0,entorno1,entorno2,entorno3]
 
 def cargar_estados() -> list[Estado]:
     # Mundo 0
@@ -61,10 +91,14 @@ def cargar_estados() -> list[Estado]:
     paletillos = [Palet(4,1,True,1,1,True),Palet(4,5,True,1,5,True)] 
     situacion2 = Estado(0,3,"E",False,paletillos)
 
-    return [situacion0,situacion1,situacion2]
+
+    # Mundo 3
+    paletillos = [Palet(20,10,False,7,17,False)]
+    situacion3 = Estado(0,0,"S",False,paletillos)
+
+    return [situacion0,situacion1,situacion2,situacion3]
 
 def main():
-    mundo_simulado = 2
     buscador = None
     camino = 0
 
@@ -78,20 +112,26 @@ def main():
    
     
     for i in range(0,len(situaciones)):
-    
-        buscador = Busqueda(situaciones[i],lista_entornos[i])
+        if lista_entornos[i] == None:
+            print("Falta entono")
+            break
+        pesos_h = [5,1,2]
+        buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
 
-        buscador.resolver(profundidad=5000)
+        buscador.resolver(profundidad=25000)
 
         if buscador != None:
             lista_tiempos = buscador.lis_tiempo_ciclo
             tiempo_medio = sum(lista_tiempos)/len(lista_tiempos)
             with open("PRUEBA_BORRAR.txt","a") as w:
+                w.writelines("Mundo: " + str(i) + "\n")
+                w.writelines("Pesos: " + str(pesos_h) + "\n")
                 w.writelines("Tiempo total calculo: " + str(buscador.tiempo_total)+ "\n")
                 w.writelines("Coste total camino: " + str(buscador.coste_final)+ "\n")
                 w.writelines("Longitud plan: " + str(buscador.longitud_camino)+ "\n")
                 w.writelines("Nodos expandidos: " + str(buscador.nodos_expandidos)+ "\n")
                 w.writelines("Tiempo medio ciclo: " + str(tiempo_medio)+ "\n")
+                w.writelines("\n")
 
             w.close()
             
