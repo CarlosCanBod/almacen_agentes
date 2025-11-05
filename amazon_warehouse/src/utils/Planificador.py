@@ -328,14 +328,16 @@ class Busqueda():
         self.lis_tiempo_ciclo: "list[float]" = []
 
 
-        self.lis_cerrada: "list[nodo_cola_prioridad]" = []
+        #self.lis_cerrada: "list[nodo_cola_prioridad]" = []
+        self.lis_cerrada: "dict[Estado,int]" = {}
+
 
         self.lis_abierta = cola_prio()    
         # Aqui se van a meter los nodos si su coste es mayor al de la cabeza de lista abierta,
         # a ver si hace que vaya mas rapido el codigo, ya que lo que hace que se vaya mas lento 
         # es meter nuevos estados en lista abierta cuando ya hay muchos.
         self.lis_abierta_lenta: cola_prio = cola_prio()
-
+        self.lis_abierta_mas_lenta: cola_prio = cola_prio()
 
         self.lis_abierta.insertar(estado_inicial,prioridad=self.heuristica_total(estado_inicial))
 
@@ -364,10 +366,10 @@ class Busqueda():
         if lista_palets != None:
             for palet in lista_palets:
 
-                c1 = 2*abs(palet.x_objetivo-palet.pos_x) + 2*abs(palet.y_objetivo-palet.pos_y)
+                c1 = abs(palet.x_objetivo-palet.pos_x) + abs(palet.y_objetivo-palet.pos_y)
 
                 if palet.ang_actual != palet.ang_objetivo:
-                    c1 = c1 + 10
+                    c1 = c1 + 3
 
                 coste = coste + c1
 
@@ -413,7 +415,7 @@ class Busqueda():
                 coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
                 
 
-        coste_total = 2*coste_palets_objetivo + 1*coste_robot_origen + 1*coste_palets_robot
+        coste_total = 5*coste_palets_objetivo + 1*coste_robot_origen + 3*coste_palets_robot
 
         if modo_djistra:
             if coste_total != 0:
@@ -735,15 +737,36 @@ class Busqueda():
 
     def insertar_en_abierta(self,estado_nuevo: Estado,coste_f_nuevo:int,valor_cabeza:int) -> None:
 
+        # Buscar en lista cerrada
+        prioridad_vieja = self.lis_cerrada.get(estado_nuevo)
+
+        # Si no esta en cerrada deberia devolver None
+        if prioridad_vieja != None:
+            if coste_f_nuevo > prioridad_vieja:
+                # Si ya existe el estado en cerrada, pero el nuevo
+                # es peor o igual, no se añade en abierta porque hay un camino mejor
+                # para llegar a ese estado.
+                return None
+            else:
+                self.lis_cerrada.pop(estado_nuevo)  # Borrar de lista cerrada el estado viejo
+                
+
         if  valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
             #print("Metido en lista abierta ")
             self.lis_abierta.insertar(dato=estado_nuevo,prioridad=coste_f_nuevo)
         else:
-            #print("Metido en lista abierta2 ")
+            valor_cabeza_lenta = self.lis_abierta_lenta.valor_cabeza()
+            if  valor_cabeza_lenta == None or valor_cabeza_lenta >= coste_f_nuevo:
+                self.lis_abierta_lenta.insertar(dato=estado_nuevo,prioridad=coste_f_nuevo)
+            else:
+                self.lis_abierta_mas_lenta.insertar(dato=estado_nuevo,prioridad=coste_f_nuevo)
 
-            self.lis_abierta_lenta.insertar(dato=estado_nuevo,prioridad=coste_f_nuevo)
+        return None
 
-
+    def actualizar_listas_abiertas(self):   
+        self.lis_abierta = self.lis_abierta_lenta
+        self.lis_abierta_lenta = self.lis_abierta_mas_lenta
+        self.lis_abierta_mas_lenta = cola_prio()
 
     def expandir(self,estado_sacado,coste_g,valor_cabeza = 9999) -> None:
                 """
@@ -864,8 +887,7 @@ class Busqueda():
             else:
                 # Si lista abierta esta vacia, se meten todos los datos de la lista lenta
                 print("Metiendo nodos lista lenta a abierta en ciclo ", ciclos)
-                self.lis_abierta = self.lis_abierta_lenta
-                self.lis_abierta_lenta = cola_prio()
+                self.actualizar_listas_abiertas()
 
                 estado_coste = self.lis_abierta.extraer()
 
@@ -875,7 +897,7 @@ class Busqueda():
                 break
 
             estado_sacado: Estado = estado_coste.dato
-
+            coste_sacado: int = estado_coste.prioridad
 
             if ciclos%100 == 0:
                 print("Ciclos: ", ciclos)
@@ -883,9 +905,11 @@ class Busqueda():
             ciclos = ciclos+1
             coste_g = 0
 
-            if estado_coste not in self.lis_cerrada:
+            if True:
+                self.lis_cerrada.get(estado_sacado)
+                #self.lis_cerrada.append(estado_coste)
 
-                self.lis_cerrada.append(estado_coste)
+                self.lis_cerrada.update({estado_sacado:coste_sacado})
                 c_h = self.heuristica_total(estado_sacado)
                 coste_g: int = estado_sacado.costo_g                         
     
@@ -989,30 +1013,13 @@ class Busqueda():
         return None
 
 def main():
-    mundo_simulado = 0
+    mundo_simulado = 1
     buscador = None
     camino = 0
 
     if mundo_simulado == 0 and buscar_errores == False:
         print("Mundo 0")
-        #Mundo 0 coste G  72  Ciclo 807  Heuristica 10* 1* 10*
-        #Mundo 0 coste G  72(l 40)  Ciclo 519  Heuristica 10* 2* 10* tiempo 0.23 expandido 894
-        #Mundo 0 coste G  66  Ciclo 1940  Heuristica 4* 2* 10*
-
-        #ARREGLADO ERROR GIRO, DETECTA OBSTACULOS ARRIBA Y ABAJO
-        #Mundo 0 coste G  66(l 38)  Ciclo 5060 Heuristica 3* 2* 5*
-        #Mundo 0 coste G  72(l 40)  Ciclo 519  Heuristica 10* 2* 10* tiempo 0.23 expandido 894
-        #Mundo 0 coste G  66(l 38)  Ciclo 1940 Heuristica 4* 2* 10* tiempo expandido 3183
-        #Mundo 0 coste G  72(l 40) Ciclo 351 Heuristica 6* 3* 8* tiempo 0.15 expandido 740
-        #Mundo 0 coste G  66(l 38)  Ciclo 3369 Heuristica 4* 2* 3* tiempo expandido 5335
-        #Mundo 0 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 6 expandido 6255 
-
-        # Lista abierta prototipo 
-        #Mundo 0 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 3.8 expandido 6255 
-        # Con valor cabeza 9999   
-        # #Mundo 0 coste G 66(l 38) Ciclo 3991 Heuristica 2* 1* 1* tiempo 5.33 expandido 6255 
-
-
+        # Coste minimo encontrado 66
 
         entorno = [
             [0, 1, 1, 1, 1, 1, 1, 0],
@@ -1040,20 +1047,6 @@ def main():
 
     elif mundo_simulado == 1:
         print("Mundo 1")
-        #Mundo 1 coste G  NADA  Ciclo 10000 Heuristica 3* 2* 40*
-        #Mundo 1 coste G  NADA  Ciclo 10000 Heuristica 3* 2* 5* tiempo 355
-        #Mundo 1 coste G  NADA  Ciclo 20000 Heuristica 3*1*2    tiempo 1080 expandido 32758
-        #Mundo 1 coste G  137 (l 76) Ciclo 1863 Heuristica 10* 2* 10*   tiempo 8.4  expandido 3235
-        #Mundo 1 coste G  NADA (l ) Ciclo 20000 Heuristica 10* 2* 0*   tiempo 470 expandido 26219
-        #Mundo 1 coste G  NADA Ciclo 20000  Heuristica 3* 2* 1* tiempo  expandido 32713 
-        # ARREGLADO FALLO GIRO
-        #Mundo 1 coste G  NADA Ciclo 10000  Heuristica 4* 2* 10* tiempo 195 expandido 16215
-        #Mundo 1 coste G  137(l 76) Ciclo 3708 Heuristica 6* 3* 8* tiempo 33 expandido 6455
-        #Mundo 1 coste G  (l ) Ciclo  Heuristica 4* 2* 3* tiempo  expandido 
-
-        # Lista abierta prototipo
-        #Mundo 1 coste G NADA(l ) Ciclo 10000 Heuristica 2* 1* 1 tiempo 105 expandido 
-
 
         entorno = [
         #Y0                                           #Y14
@@ -1086,19 +1079,10 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.resolver(profundidad=10000)
+        buscador.resolver(profundidad=25000)
     elif mundo_simulado == 2:
         print("Mundo 2")
-        # Mundo 2 coste G 58(l 36) Ciclo 13507 Heuristica 2* 1* 0* tiempo 47 expandido 16771
-        # Mundo 2 coste G 58(l 36) Ciclo 5288 Heuristica 2* 1* 1* tiempo 8 expandido 7265 
-        # Mundo 2 coste G 58(l 36) Ciclo 1757 Heuristica 5* 1* 1* tiempo 1 expandido 2525
-
-
-        # Lista abierta prototipo 
-        #Mundo 2 coste G 58(l 36) Ciclo 5288 Heuristica 2* 1* 1* tiempo 7.2 expandido 7265 
-        # Con valor cabeza 9999   
-       #Mundo 2 coste G 58(l 36) Ciclo 5288 Heuristica 2* 1* 1* tiempo 7.57 expandido 7265
-
+        # Minimo camino 58
         entorno = [
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
