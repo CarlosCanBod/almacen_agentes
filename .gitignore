@@ -220,3 +220,6 @@ __marimo__/
 .vscode/backup/
 .vscode/.vscode/
 .vscode/.devcontainer/
+
+# Cosas de prueba
+PRUEBA_BORRAR.txt
