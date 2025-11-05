@@ -81,7 +81,7 @@ class Practica1:
 
         if situacion1 != None:
             buscador = pl.Busqueda(situacion1,entorno)
-            camino_junto = buscador.expandir(profundidad=5000)
+            camino_junto = buscador.resolver(profundidad=5000)
 
 
         if camino_junto != None:
