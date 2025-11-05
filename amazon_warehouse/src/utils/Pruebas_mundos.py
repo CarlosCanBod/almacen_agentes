@@ -1,16 +1,8 @@
 from Planificador import Palet,Estado, Busqueda
 import matplotlib.pyplot as plt
 
-def main():
-    mundo_simulado = 2
-    buscador = None
-    camino = 0
-
-    if mundo_simulado == 0:
-        print("Mundo 0")
-        # Coste minimo encontrado 66
-
-        entorno = [
+def cargar_entornos() -> list[list[list[int]]]:
+    entorno0 = [
             [0, 1, 1, 1, 1, 1, 1, 0],
             [0, 1, 0, 0, 0, 0, 1, 0],
             [0, 1, 0, 0, 0, 0, 1, 0],
@@ -22,23 +14,7 @@ def main():
             [0, 0, 1, 0, 0, 0, 1, 0],
             [0, 0, 1, 1, 1, 1, 1, 0]
         ]
-
-    
-        paletillos = [Palet(5,2,False,1,5,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
-
-        situacion1 = Estado(8,4,"N",False,paletillos)
-
-        buscador = Busqueda(situacion1,entorno)
-
-        buscador.resolver(profundidad=50000)
-
-        
-
-    elif mundo_simulado == 1:
-        print("Mundo 1")
-        # coste minimo 131 h 5* 1* 3* ciclo 13100
-
-        entorno = [
+    entorno1 = [
         #Y0                                           #Y14
             [0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0],  #X 0
             [0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0],
@@ -57,24 +33,7 @@ def main():
             [0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0]   #X 14
             ]
 
-        
-        paletillos = [Palet(9,3,False,9,3,False),Palet(7,3,False,7,3,False), # Palets izquierda
-                     Palet(9,5,False,2,5,False),Palet(7,5,False,7,5,False),
-                          
-                        Palet(9,10,False,9,10,False),Palet(7,10,False,1,7,True), # Palets derecha
-                        Palet(9,12,False,9,12,False),Palet(7,12,False,7,12,False)
-                          ]                             # Palets mas arriba
-
-        situacion1 = Estado(12,7,"N",False,paletillos)
-
-        buscador = Busqueda(situacion1,entorno)
-
-        buscador.resolver(profundidad=25000)
-    elif mundo_simulado == 2:
-        print("Mundo 2")
-        # Minimo camino 58
-        # coste minimo 58 h 5* 1* 2*
-        entorno = [
+    entorno2 = [
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
@@ -82,45 +41,73 @@ def main():
             [0, 0, 0, 0, 0, 0, 0]
         ]
 
-        paletillos = [Palet(4,1,True,1,1,True),Palet(4,5,True,1,5,True)] 
-        situacion1 = Estado(0,3,"E",False,paletillos)
+    return [entorno0,entorno1,entorno2]
 
-        buscador = Busqueda(situacion1,entorno)
+def cargar_estados() -> list[Estado]:
+    # Mundo 0
+    paletillos = [Palet(5,2,False,1,5,True)] 
+    situacion0 = Estado(8,4,"N",False,paletillos)
 
-        buscador.resolver(profundidad=20000)
+    # Mundo 1
+    paletillos = [Palet(9,3,False,9,3,False),Palet(7,3,False,7,3,False), # Palets izquierda
+                     Palet(9,5,False,2,5,False),Palet(7,5,False,7,5,False),
+                          
+                        Palet(9,10,False,9,10,False),Palet(7,10,False,1,7,True), # Palets derecha
+                        Palet(9,12,False,9,12,False),Palet(7,12,False,7,12,False)
+                          ]                             # Palets mas arriba
+    situacion1 = Estado(12,7,"N",False,paletillos)
 
+    # Mundo 2
+    paletillos = [Palet(4,1,True,1,1,True),Palet(4,5,True,1,5,True)] 
+    situacion2 = Estado(0,3,"E",False,paletillos)
 
+    return [situacion0,situacion1,situacion2]
 
-    elif mundo_simulado == 10:
-        entorno = [
-            [1, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 0, 0, 0, 1],
-            [1, 0, 0, 9, 9, 9, 1],
-        ]
+def main():
+    mundo_simulado = 2
+    buscador = None
+    camino = 0
 
-        paletillos = [Palet(1,3,True,1,5,True)] #[Palet(1,1,True,1,4,True),Palet(3,1,True,3,4,True)] 1,4
-        situacion1 = Estado(1,3,"E",True,paletillos)
+    lista_entornos = cargar_entornos()
+    situaciones = cargar_estados()
+    try:
+        with open("PRUEBA_BORRAR.txt","x") as f:
+            pass
+        f.close()
+    except: pass
+   
+    
+    for i in range(0,len(situaciones)):
+    
+        buscador = Busqueda(situaciones[i],lista_entornos[i])
 
-        buscador = Busqueda(situacion1,entorno)
+        buscador.resolver(profundidad=5000)
 
-        sit2 = buscador.girar(situacion1,False)
+        if buscador != None:
+            lista_tiempos = buscador.lis_tiempo_ciclo
+            tiempo_medio = sum(lista_tiempos)/len(lista_tiempos)
+            with open("PRUEBA_BORRAR.txt","a") as w:
+                w.writelines("Tiempo total calculo: " + str(buscador.tiempo_total)+ "\n")
+                w.writelines("Coste total camino: " + str(buscador.coste_final)+ "\n")
+                w.writelines("Longitud plan: " + str(buscador.longitud_camino)+ "\n")
+                w.writelines("Nodos expandidos: " + str(buscador.nodos_expandidos)+ "\n")
+                w.writelines("Tiempo medio ciclo: " + str(tiempo_medio)+ "\n")
 
-        buscador.imprimir(sit2,entorno)
+            w.close()
+            
+            print("Tiempo total calculo: ", buscador.tiempo_total)
+            print("Coste total camino: ", buscador.coste_final)
+            
+            print("Longitud plan: ", buscador.longitud_camino)
+            print("Nodos expandidos: ",buscador.nodos_expandidos)
 
+            lista_tiempos = buscador.lis_tiempo_ciclo
+            
+            print("Tiempo medio ciclo: ", tiempo_medio)
 
-    if buscador != None:
-        print("Tiempo total calculo: ", buscador.tiempo_total)
-        print("Coste total camino: ", buscador.coste_final)
-        
-        print("Longitud plan: ", buscador.longitud_camino)
-        print("Nodos expandidos: ",buscador.nodos_expandidos)
+            #plt.plot(lista_tiempos)
+            #plt.show()
 
-        lista_tiempos = buscador.lis_tiempo_ciclo
-        
-        print("Tiempo medio ciclo: ", sum(lista_tiempos)/len(lista_tiempos))
-
-        plt.plot(lista_tiempos)
-        plt.show()
 
     return None
 

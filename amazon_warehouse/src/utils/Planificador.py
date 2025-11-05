@@ -873,8 +873,8 @@ class Busqueda():
         tiempo_inicio = time()
 
 
-        print("INICIAL DIBUJO", self.estado_ini.Lista_estanterias[0].ang_actual)
-        self.imprimir(self.estado_ini,self.entorno)
+        #print("INICIAL DIBUJO", self.estado_ini.Lista_estanterias[0].ang_actual)
+        #self.imprimir(self.estado_ini,self.entorno)
 
         while  (profundidad > ciclos) and Exito == False:
             tiempo_inicio_bucle = time()
