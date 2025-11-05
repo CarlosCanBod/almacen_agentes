@@ -301,7 +301,7 @@ class Estado():
 
 class Busqueda():
 
-    def __init__(self,estado_inicial: "Estado", entorno: "list[list]") -> None:
+    def __init__(self,estado_inicial: "Estado", entorno: "list[list]",pesos: list[int] = [5,1,2]) -> None:
         # Mapeo de orientaciones
         self.movimientos = {
             'N': (-1, 0),
@@ -315,10 +315,12 @@ class Busqueda():
         self.estado_ini = estado_inicial
         self.estado_actual = estado_inicial
 
+        self.peso1 = pesos[0]
+        self.peso2 = pesos[1]
+        self.peso3 = pesos[2]
 
         self.filas = len(entorno)
         self.columnas = len(entorno[0])
-
         self.entorno = entorno
 
         self.coste_final:int = 0
@@ -415,7 +417,7 @@ class Busqueda():
                 coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
                 
 
-        coste_total = 5*coste_palets_objetivo + 1*coste_robot_origen + 3*coste_palets_robot
+        coste_total = self.peso1*coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
 
         if modo_djistra:
             if coste_total != 0:
@@ -1013,7 +1015,7 @@ class Busqueda():
         return None
 
 def main():
-    mundo_simulado = 1
+    mundo_simulado = 2
     buscador = None
     camino = 0
 
@@ -1047,6 +1049,7 @@ def main():
 
     elif mundo_simulado == 1:
         print("Mundo 1")
+        # coste minimo 131 h 5* 1* 3* ciclo 13100
 
         entorno = [
         #Y0                                           #Y14
@@ -1083,6 +1086,7 @@ def main():
     elif mundo_simulado == 2:
         print("Mundo 2")
         # Minimo camino 58
+        # coste minimo 58 h 5* 1* 2*
         entorno = [
             [0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0],
