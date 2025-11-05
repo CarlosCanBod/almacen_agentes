@@ -2,7 +2,7 @@
 from typing import Any
 from time import time
 import numpy as np  # Se usa para copiar el entorno para el mapa.
-
+import matplotlib.pyplot as plt
 
 from typing import Any
 
@@ -325,12 +325,12 @@ class Busqueda():
         self.longitud_camino: int = 0
         self.tiempo_total: float = 0.0
         self.nodos_expandidos: int = 0
+        self.lis_tiempo_ciclo: "list[float]" = []
+
 
         self.lis_cerrada: "list[nodo_cola_prioridad]" = []
 
-
         self.lis_abierta = cola_prio()    
-
         # Aqui se van a meter los nodos si su coste es mayor al de la cabeza de lista abierta,
         # a ver si hace que vaya mas rapido el codigo, ya que lo que hace que se vaya mas lento 
         # es meter nuevos estados en lista abierta cuando ya hay muchos.
@@ -755,10 +755,10 @@ class Busqueda():
         self.imprimir(self.estado_ini,self.entorno)
 
         while  (profundidad > ciclos) and Exito == False:
+            tiempo_inicio_bucle = time()
 
             repetido:bool = False
             sucesores: "list[Estado]" =[]
-
 
             valor_cabeza = self.lis_abierta.valor_cabeza()
 
@@ -767,13 +767,16 @@ class Busqueda():
             else:
                 # Si lista abierta esta vacia, se meten todos los datos de la lista lenta
                 print("Metiendo nodos lista lenta a abierta")
-
+                """
                 while self.lis_abierta_lenta.vacio() == False:
                     estado_coste_aux = self.lis_abierta_lenta.extraer()
 
                     if estado_coste_aux != None:
                         self.lis_abierta.insertar(estado_coste_aux.dato,estado_coste_aux.prioridad)
                     else:break
+                """
+                self.lis_abierta = self.lis_abierta_lenta
+                self.lis_abierta_lenta = cola_prio()
 
                 estado_coste = self.lis_abierta.extraer()
 
@@ -795,14 +798,15 @@ class Busqueda():
 
             if estado_coste not in self.lis_cerrada:
 
-
-
                 self.lis_cerrada.append(estado_coste)
                 c_h = self.heuristica_total(estado_sacado)
                 coste_g: int = estado_sacado.costo_g                         
     
                 if c_h == 0:
                     Exito = True
+                    repetido = True # Para que no expanda una vez tenga exito
+                    #self.lis_tiempo_ciclo.append(time() - tiempo_inicio_bucle)
+
                     self.coste_final = c_h + coste_g
                     print("Llegado al final en ciclo ", ciclos)
                     print("Coste H: ",c_h)
@@ -931,7 +935,9 @@ class Busqueda():
 
                 #print("Tiempo expandir: ", time() - tiempo_in_expandir)
             # Imprimir los sucesores generados
-            
+
+                
+
             if buscar_errores and Exito == False:
                 #print(self.lis_abierta)
 
@@ -947,8 +953,15 @@ class Busqueda():
             
             repetido:bool = False
 
+
+            self.lis_tiempo_ciclo.append(time() - tiempo_inicio_bucle)
+
+
             if self.lis_abierta_lenta.vacio() and self.lis_abierta.vacio():
                 break
+
+            
+
 
 
         if len(self.lis_abierta) == 0 and Exito == False:
@@ -1022,7 +1035,7 @@ class Busqueda():
         return None
 
 def main():
-    mundo_simulado =1
+    mundo_simulado = 1
     buscador = None
     camino = 0
 
@@ -1067,7 +1080,9 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        camino = buscador.expandir(profundidad=5000)
+        buscador.expandir(profundidad=5000)
+
+        
 
     elif mundo_simulado == 1:
         print("Mundo 1")
@@ -1117,7 +1132,7 @@ def main():
 
         buscador = Busqueda(situacion1,entorno)
 
-        buscador.expandir(profundidad=10000)
+        buscador.expandir(profundidad=2000)
     elif mundo_simulado == 2:
         print("Mundo 2")
         # Mundo 2 coste G 58(l 36) Ciclo 13507 Heuristica 2* 1* 0* tiempo 47 expandido 16771
@@ -1170,6 +1185,13 @@ def main():
         
         print("Longitud plan: ", buscador.longitud_camino)
         print("Nodos expandidos: ",buscador.nodos_expandidos)
+
+        lista_tiempos = buscador.lis_tiempo_ciclo
+        
+        print("Tiempo medio ciclo: ", sum(lista_tiempos)/len(lista_tiempos))
+
+        plt.plot(lista_tiempos)
+        plt.show()
 
     return None
 
