@@ -1,5 +1,6 @@
 from Planificador import Palet,Estado, Busqueda
 import matplotlib.pyplot as plt
+from numpy import  savetxt
 
 def cargar_entornos() -> list[list[list[int]]]:
     entorno0 = [
@@ -99,7 +100,7 @@ def cargar_entornos() -> list[list[list[int]]]:
 
 
 
-    return [entorno0,entorno1,entorno2,entorno3]
+    return [entorno0,entorno1,entorno2,entorno3,entorno4]
 
 def cargar_estados() -> list[Estado]:
     # Mundo 0
@@ -129,11 +130,12 @@ def cargar_estados() -> list[Estado]:
     situacion4 = Estado(0,0,"S",False,paletillos)
 
 
-    return [situacion0,situacion1,situacion2,situacion3]
+    return [situacion0,situacion1,situacion2,situacion3,situacion4]
 
 def main():
     buscador = None
     medir_memoria = False
+    camino = []
 
     lista_entornos = cargar_entornos()
     situaciones = cargar_estados()
@@ -151,7 +153,7 @@ def main():
         pesos_h = [5,1,2]
         buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
 
-        buscador.resolver(profundidad=70000,medir_memoria= medir_memoria)
+        camino = buscador.resolver(profundidad=20000,medir_memoria= medir_memoria)
 
         if buscador != None:
             lista_tiempos = buscador.lis_tiempo_ciclo
@@ -160,6 +162,7 @@ def main():
                 w.writelines("Mundo: " + str(i) + "\n")
                 if medir_memoria:
                     w.writelines("Midiendo uso memoria \n")
+                w.writelines("Camino: " + str(camino) + "\n")
                 w.writelines("Pesos: " + str(pesos_h) + "\n")
                 w.writelines("Tiempo total calculo: " + str(buscador.tiempo_total)+ "\n")
                 w.writelines("Coste total camino: " + str(buscador.coste_final)+ "\n")
@@ -180,6 +183,13 @@ def main():
             
             print("Tiempo medio ciclo: ", tiempo_medio)
 
+            try:
+                savetxt("tiempos_mundo_" + str(i) + ".csv", lista_tiempos, delimiter=",")
+                if medir_memoria:
+                    savetxt("uso_memoria_mundo_" + str(i) + ".csv", buscador.lis_memoria_ciclo, delimiter=",")
+            except:
+                pass
+
             #plt.plot(lista_tiempos)
             if medir_memoria:
                 plt.plot(buscador.lis_memoria_ciclo)
@@ -192,7 +202,7 @@ def main():
                 plt.xlabel("Ciclos")
                 plt.ylabel("Tiempo por ciclo")
                 plt.title("Tiempo por ciclo en busqueda - Mundo " + str(i))
-                plt.show()
+                #plt.show()
 
 
     return None

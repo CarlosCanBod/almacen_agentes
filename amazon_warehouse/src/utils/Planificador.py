@@ -126,6 +126,31 @@ class cola_prio():
         except:
             print("Error al introducir elemento en la lista")
 
+    def eliminar(self,dato: Any,prioridad: int):
+    
+        if self.cabeza != None:
+            nodo_actual = self.cabeza   # Se busca aqui el nodo a eliminar
+            nodo_previo = None
+            fin = False
+
+            while (nodo_actual != None) and (fin == False):
+                if nodo_actual.dato == dato and nodo_actual.prioridad == prioridad:
+                    fin = True
+                else: # Se va al siguiente nodo
+                    nodo_previo = nodo_actual
+                    nodo_actual = nodo_actual.siguiente
+
+            if fin == True:
+                if nodo_previo != None:
+                    nodo_previo.siguiente = nodo_actual.siguiente  # type: ignore
+                else:
+                    # Si es el primero el que se borra
+                    if nodo_actual != None:
+                        self.cabeza = nodo_actual.siguiente
+
+        
+
+
 
     #Si la cola esta vacia devuelve true
     def vacio(self):
@@ -236,19 +261,6 @@ class Palet():
 
         return hash((self.pos_x,self.pos_y,self.ang_actual,self.x_objetivo,self.y_objetivo,self.ang_objetivo))
 
-
-    def comprobar_lugar_deseado(self) -> bool:
-        
-        if self.pos_x != self.x_objetivo:
-            return False
-        elif self.pos_y != self.y_objetivo:
-            return False
-        elif self.ang_actual != self.ang_objetivo:
-            return False
-
-        return True
-    
-
     def __str__(self) -> str:
         return f"Lugar(x={self.pos_x}, y={self.pos_y}, ori='{self.ang_actual}')"
 
@@ -336,6 +348,12 @@ class Busqueda():
 
         #self.lis_cerrada: "list[nodo_cola_prioridad]" = []
         self.lis_cerrada: "dict[Estado,int]" = {}
+
+
+        # Se va a usar para a la hora de insertar en lista abierta
+        # mirar si esta en abierta, y si lo esta pues se hace la cosa lenta
+        # de cambiarlo por el nuevo si es mas barato
+        self.diccionario_estados_abierta: "dict[Estado,int]" = {}
 
 
         self.lis_abierta = cola_prio()    
@@ -753,6 +771,32 @@ class Busqueda():
                                                     # para hacer dic mas pequeño, alomejor no se deberia hacer
                                                     # porque hasta que no se meta el otro se podrian repetir estados
 
+
+
+        coste_estado_en_abierta = self.diccionario_estados_abierta.get(estado_nuevo) # Supongo que da None si no esta en abierta
+
+        if coste_estado_en_abierta != None:
+            # Si ya existe en abierta, mirar si el nuevo es mejor
+            if coste_f_nuevo < coste_estado_en_abierta:
+                # Si es mejor el nuevo estado, hay que buscar y sacar el viejo de abierta
+                # y meter el nuevo
+                self.diccionario_estados_abierta.pop(estado_nuevo)
+
+                if  valor_cabeza != None and valor_cabeza >= coste_estado_en_abierta: # Se busca en la lista donde deberia estar ese estado,prio
+                    #print("Metido en lista abierta ")
+                    self.lis_abierta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
+                else:
+                    valor_cabeza_lenta = self.lis_abierta_lenta.valor_cabeza()
+                    if  valor_cabeza != None and valor_cabeza_lenta >= coste_estado_en_abierta:
+                        self.lis_abierta_lenta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
+                    else:
+                        self.lis_abierta_mas_lenta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
+
+
+
+
+
+
         if  valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
             #print("Metido en lista abierta ")
             self.lis_abierta.insertar(dato=estado_nuevo,prioridad=coste_f_nuevo)
@@ -906,6 +950,10 @@ class Busqueda():
 
             estado_sacado: Estado = estado_coste.dato
             coste_sacado: int = estado_coste.prioridad
+
+            self.diccionario_estados_abierta.pop(estado_sacado, None)
+
+
 
             if ciclos%100 == 0:
                 print("Ciclos: ", ciclos)
