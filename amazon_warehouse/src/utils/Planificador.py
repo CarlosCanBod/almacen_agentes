@@ -448,9 +448,6 @@ class Busqueda():
         for palet in lis_estanterias:
             if cord_robot_x == palet.pos_x and cord_robot_y == palet.pos_y:
                 rob_activado = not(rob_activado)
-
-                print("")
-
                 estado_nuevo: Estado = Estado(cord_robot_x,cord_robot_y,robot_angulo,rob_activado,lis_estanterias)
                 return estado_nuevo
 
