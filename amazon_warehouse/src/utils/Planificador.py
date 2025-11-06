@@ -3,7 +3,6 @@ from typing import Any
 from time import time
 import numpy as np  # Se usa para copiar el entorno para el mapa.
 import matplotlib.pyplot as plt
-import psutil   # para ver consumo de memoria
 import tracemalloc
 
 
@@ -924,10 +923,7 @@ class Busqueda():
 
         while  (profundidad > ciclos) and Exito == False:
             tiempo_inicio_bucle = time()
-            #self.lis_memoria_ciclo.append(psutil.virtual_memory().used / (1024 * 1024))  # Memoria en MB
-            if medir_memoria:
-                mem = tracemalloc.get_traced_memory()[0]
-                self.lis_memoria_ciclo.append(mem)
+        
 
             repetido:bool = False
             sucesores: "list[Estado]" =[]
@@ -956,10 +952,7 @@ class Busqueda():
 
 
             if ciclos%100 == 0:
-                print("Ciclos: ", ciclos)
-
-            
-
+                print("Ciclos: ", ciclos, "Coste F minimo: ",coste_sacado)
 
             ciclos = ciclos+1
             coste_g = 0
@@ -997,7 +990,11 @@ class Busqueda():
 
        
             repetido:bool = False
-            self.lis_tiempo_ciclo.append(time() - tiempo_inicio_bucle)
+            if medir_memoria:
+                mem = tracemalloc.get_traced_memory()[0]
+                self.lis_memoria_ciclo.append(mem)
+            else:
+                self.lis_tiempo_ciclo.append(time() - tiempo_inicio_bucle)
        
 
         if len(self.lis_abierta) == 0 and Exito == False:

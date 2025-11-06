@@ -223,5 +223,6 @@ __marimo__/
 
 # Cosas de prueba
 PRUEBA_BORRAR.txt
+estadisticas.txt
 tiempos_mundo_*.csv
 uso_memoria_mundo_*.csv

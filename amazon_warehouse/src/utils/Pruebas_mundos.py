@@ -44,31 +44,31 @@ def cargar_entornos() -> list[list[list[int]]]:
         ]
 
     entorno3 = [
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],# X 0
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [9, 9, 9, 9, 0, 9, 9, 9, 9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9 ,9],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,9 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,9 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 9, 9, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 9, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
-            [0, 0, 0, 0, 0, 0, 0, 0, 0 ,9 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0]    
-        ]
+            [1, 1, 1, 1, 1, 1, 1, 1, 1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1],# X 0
+            [1, 0, 0, 0, 1, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 9, 0, 0, 0, 0 ,0 ,0 ,9 ,1 ,1 ,1 ,0 ,1 ,1 ,1 ,1],# x 5
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,9 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],# x 10
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 9, 0, 0, 0, 0 ,0 ,0 ,9 ,0 ,0 ,0 ,0 ,9 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],# 15
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],# x 20
+            [1, 0, 0, 0, 0, 0, 0, 0, 1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0]    #x 23
+        ]   #y0            #y5           #y10           #y15         #y19            
 
     entorno4 = [
             [0, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0], # X 0
@@ -122,87 +122,95 @@ def cargar_estados() -> list[Estado]:
 
 
     # Mundo 3
-    paletillos = [Palet(20,10,False,7,17,False),Palet(20,10,False,7,17,False)]
-    situacion3 = Estado(0,0,"S",False,paletillos)
+    #paletillos = [Palet(21,1,False,2,13,False),Palet(21,3,False,2,15,False),   # Original
+    #              Palet(21,5,False,2,17,False),Palet(2,18,False,21,7,False)]
+
+    paletillos = [Palet(21,1,False,2,13,False),Palet(21,3,False,21,3,False),
+                  Palet(21,5,False,21,5,False),Palet(2,18,False,2,18,False)]
+    situacion3 = Estado(1,1,"S",False,paletillos)
 
     # Mundo 4
     paletillos = [Palet(18,6,False,5,30,True),Palet(18,8,False,30,20,True)]
     situacion4 = Estado(0,0,"S",False,paletillos)
 
 
-    return [situacion0,situacion1,situacion2,situacion3,situacion4]
+    return [situacion0,situacion1,situacion2,situacion3]
 
 def main():
     buscador = None
-    medir_memoria = False
     camino = []
-
     lista_entornos = cargar_entornos()
     situaciones = cargar_estados()
     try:
-        with open("PRUEBA_BORRAR.txt","x") as f:
+        with open("estadisticas.txt","x") as f:
             pass
         f.close()
     except: pass
-   
-    
-    for i in range(0,len(situaciones)):
-        if lista_entornos[i] == None:
-            print("Falta entono")
-            break
-        pesos_h = [5,1,2]
-        buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
 
-        camino = buscador.resolver(profundidad=20000,medir_memoria= medir_memoria)
+    rapido: bool = False
 
-        if buscador != None:
-            lista_tiempos = buscador.lis_tiempo_ciclo
-            tiempo_medio = sum(lista_tiempos)/len(lista_tiempos)
-            with open("PRUEBA_BORRAR.txt","a") as w:
-                w.writelines("Mundo: " + str(i) + "\n")
+
+    medir_memoria: bool = False
+    calculando: bool  = True
+    while calculando:
+
+        for i in range(0,len(situaciones)):
+            if lista_entornos[i] == None:
+                print("Falta entono")
+                break
+            pesos_h = [5,1,2]
+            buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
+
+            
+            camino = buscador.resolver(profundidad=30000,medir_memoria= medir_memoria)
+            
+
+            if buscador != None:
+                lista_tiempos = buscador.lis_tiempo_ciclo
                 if medir_memoria:
-                    w.writelines("Midiendo uso memoria \n")
-                w.writelines("Camino: " + str(camino) + "\n")
-                w.writelines("Pesos: " + str(pesos_h) + "\n")
-                w.writelines("Tiempo total calculo: " + str(buscador.tiempo_total)+ "\n")
-                w.writelines("Coste total camino: " + str(buscador.coste_final)+ "\n")
-                w.writelines("Longitud plan: " + str(buscador.longitud_camino)+ "\n")
-                w.writelines("Nodos expandidos: " + str(buscador.nodos_expandidos)+ "\n")
-                w.writelines("Tiempo medio ciclo: " + str(tiempo_medio)+ "\n")
-                w.writelines("\n")
+                    tiempo_medio = 0
+                else:
+                    tiempo_medio = sum(lista_tiempos)/len(lista_tiempos)
 
-            w.close()
+                print("Tiempo total calculo: ", buscador.tiempo_total)
+                print("Coste total camino: ", buscador.coste_final)
+                print("Longitud plan: ", buscador.longitud_camino)
+                print("Nodos expandidos: ",buscador.nodos_expandidos)
+                print("Tiempo medio ciclo: ", tiempo_medio)
             
-            print("Tiempo total calculo: ", buscador.tiempo_total)
-            print("Coste total camino: ", buscador.coste_final)
+
+                with open("estadisticas.txt","a") as w:
+                    w.writelines("Mundo: " + str(i) + "\n")
+                    if medir_memoria:
+                        w.writelines("Midiendo uso memoria \n")
+                    w.writelines("Camino: " + str(camino) + "\n")
+                    w.writelines("Pesos: " + str(pesos_h) + "\n")
+                    w.writelines("Tiempo total calculo: " + str(buscador.tiempo_total)+ "\n")
+                    w.writelines("Coste total camino: " + str(buscador.coste_final)+ "\n")
+                    w.writelines("Longitud plan: " + str(buscador.longitud_camino)+ "\n")
+                    w.writelines("Nodos expandidos: " + str(buscador.nodos_expandidos)+ "\n")
+                    w.writelines("Tiempo medio ciclo: " + str(tiempo_medio)+ "\n")
+                    w.writelines("\n")
+
+                w.close()
+                
             
-            print("Longitud plan: ", buscador.longitud_camino)
-            print("Nodos expandidos: ",buscador.nodos_expandidos)
+                
+                try:
+                    
+                    if medir_memoria:
+                        savetxt("uso_memoria_mundo_" + str(i) + ".csv", buscador.lis_memoria_ciclo, delimiter=",")
+                    else:
+                        savetxt("tiempos_mundo_" + str(i) + ".csv", lista_tiempos, delimiter=",")
+                except:
+                    pass
 
-            lista_tiempos = buscador.lis_tiempo_ciclo
-            
-            print("Tiempo medio ciclo: ", tiempo_medio)
-
-            try:
-                savetxt("tiempos_mundo_" + str(i) + ".csv", lista_tiempos, delimiter=",")
-                if medir_memoria:
-                    savetxt("uso_memoria_mundo_" + str(i) + ".csv", buscador.lis_memoria_ciclo, delimiter=",")
-            except:
-                pass
-
-            #plt.plot(lista_tiempos)
-            if medir_memoria:
-                plt.plot(buscador.lis_memoria_ciclo)
-                plt.xlabel("Ciclos")
-                plt.ylabel("Memoria usada")
-                plt.title("Consumo de memoria en busqueda - Mundo " + str(i))
-                plt.show()
-            else:
-                plt.plot(lista_tiempos)
-                plt.xlabel("Ciclos")
-                plt.ylabel("Tiempo por ciclo")
-                plt.title("Tiempo por ciclo en busqueda - Mundo " + str(i))
-                #plt.show()
+        if medir_memoria:
+            calculando = False
+        else:
+            if rapido:
+                calculando = False
+            medir_memoria = True
 
 
     return None
