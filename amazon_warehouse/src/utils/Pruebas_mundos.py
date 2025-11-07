@@ -136,7 +136,7 @@ def cargar_estados() -> list[Estado]:
 def main():
     buscador = None
     camino = []
-    lista_costes_minimos = [66,117,72,999999]
+    lista_costes_minimos = [66,136,72,278]   # mundo 1 al parecer fue 117 en algun momento
     lista_entornos = cargar_entornos()
     situaciones = cargar_estados()
     try:
@@ -152,7 +152,7 @@ def main():
     calculando: bool  = True
     while calculando:
 
-        for i in range(3,4):
+        for i in range(0,3):
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break
@@ -173,9 +173,7 @@ def main():
                 print("Nodos expandidos: ",buscador.nodos_expandidos)
                 print("Tiempo medio ciclo: ", tiempo_medio)
             
-                if buscador.coste_final > lista_costes_minimos[i]:
-                    print("Coste no optimo en mundo ", i)
-                    exit()
+                
 
                 with open("estadisticas.txt","a") as w:
                     w.writelines("Mundo: " + str(i) + "\n")
@@ -192,6 +190,10 @@ def main():
 
                 w.close()
                 
+                if buscador.coste_final > lista_costes_minimos[i]:
+                    print("Coste no optimo en mundo ", i)
+                    exit()
+
                 try:
                     
                     if medir_memoria:

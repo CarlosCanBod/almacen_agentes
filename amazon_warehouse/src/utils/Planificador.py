@@ -943,7 +943,6 @@ class Busqueda():
         
 
             repetido:bool = False
-            sucesores: "list[Estado]" =[]
 
             valor_cabeza = self.lis_abierta.valor_cabeza()
 
@@ -964,9 +963,7 @@ class Busqueda():
             estado_sacado: Estado = estado_coste.dato
             coste_sacado: int = estado_coste.prioridad
 
-            self.diccionario_estados_abierta.pop(estado_sacado, None)
-
-
+            self.diccionario_estados_abierta.pop(estado_sacado)
 
             if ciclos%100 == 0:
                 print("Ciclos: ", ciclos, "Coste F minimo: ",coste_sacado, "Coste H: ", self.heuristica_total(estado_sacado))
