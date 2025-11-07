@@ -127,7 +127,7 @@ class cola_prio():
         except:
             print("Error al introducir elemento en la lista")
 
-    def eliminar(self,dato: Any,prioridad: int):
+    def eliminar(self,dato: Any,prioridad: int) -> None:
     
         if self.cabeza != None:
             nodo_actual = self.cabeza   # Se busca aqui el nodo a eliminar
@@ -144,12 +144,14 @@ class cola_prio():
             if fin == True:
                 if nodo_previo != None:
                     nodo_previo.siguiente = nodo_actual.siguiente  # type: ignore
+                    return None
                 else:
                     # Si es el primero el que se borra
                     if nodo_actual != None:
                         self.cabeza = nodo_actual.siguiente
-            print("Eliminado: ",dato,prioridad)
-        
+                        return None
+            print("ERROR NO ENCONTRADO DATO PARA ELIMINAR: ",dato,prioridad)
+            return None
 
 
 
