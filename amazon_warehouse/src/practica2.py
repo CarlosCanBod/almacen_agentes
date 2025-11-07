@@ -17,11 +17,7 @@ class Practica1:
         #self.execTest0()
         # NOTA: Implementar la funcion execSearch con el algoritmo de busqueda seleccionado. Una vez implementado, descomentar la llamada a la funcion en este init, generar el plan a partir de las
         # peticiones (requests) que reciba, y ejecutarlo en Gazebo
-
-	
-
-     
-
+        
     def execSearch(self):
         mundo_gazebo: int = 0
         situacion1 = None
