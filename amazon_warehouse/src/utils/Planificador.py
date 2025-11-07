@@ -306,9 +306,6 @@ class Estado():
         else:
             return  self.estado_padre.volver_inicio() + "." + self.accion 
 
-
-
-
     def __eq__(self: "Estado", otro_estado: "Estado"):  # type: ignore
 
         return  hash(self) == hash(otro_estado)
@@ -360,13 +357,13 @@ class Busqueda():
 
 
         #self.lis_cerrada: "list[nodo_cola_prioridad]" = []
-        self.lis_cerrada: "dict[Estado,int]" = {}
+        self.lis_cerrada: "dict[int,int]" = {}
 
 
         # Se va a usar para a la hora de insertar en lista abierta
         # mirar si esta en abierta, y si lo esta pues se hace la cosa lenta
         # de cambiarlo por el nuevo si es mas barato
-        self.diccionario_estados_abierta: "dict[Estado,int]" = {}
+        self.diccionario_estados_abierta: "dict[int,int]" = {}
 
 
         self.lis_abierta = cola_prio()    
@@ -377,8 +374,7 @@ class Busqueda():
         self.lis_abierta_mas_lenta: cola_prio = cola_prio()
 
         self.lis_abierta.insertar(estado_inicial,prioridad=self.heuristica_total(estado_inicial))
-        self.diccionario_estados_abierta.update({estado_inicial:self.heuristica_total(estado_inicial)})
-        print(self.diccionario_estados_abierta)
+        self.diccionario_estados_abierta.update({hash(estado_inicial):self.heuristica_total(estado_inicial)})
 
         return None
     
@@ -409,7 +405,7 @@ class Busqueda():
                 if palet.ang_actual != palet.ang_objetivo:
                     c1 = c1 + 1
 
-                coste = coste + c1
+                coste = coste + self.peso1*c1
 
 
         return coste
@@ -449,7 +445,7 @@ class Busqueda():
                 coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
                 
 
-        coste_total = self.peso1*coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
+        coste_total = coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
 
         if modo_djistra:
             if coste_total != 0:
@@ -767,7 +763,8 @@ class Busqueda():
     def insertar_en_abierta(self,estado_nuevo: Estado,coste_f_nuevo:int,valor_cabeza:int) -> None:
 
         # Buscar en lista cerrada
-        prioridad_vieja = self.lis_cerrada.get(estado_nuevo)
+        hash_estado = hash(estado_nuevo)
+        prioridad_vieja = self.lis_cerrada.get(hash_estado)
 
         # Si no esta en cerrada deberia devolver None
         if prioridad_vieja != None:
@@ -777,20 +774,19 @@ class Busqueda():
                 # para llegar a ese estado.
                 return None
             else:
-                self.lis_cerrada.pop(estado_nuevo)  # Borrar de lista cerrada el estado viejo
+                self.lis_cerrada.pop(hash_estado)  # Borrar de lista cerrada el estado viejo
                                                     # para hacer dic mas pequeño, alomejor no se deberia hacer
                                                     # porque hasta que no se meta el otro se podrian repetir estados
 
-        coste_estado_en_abierta = self.diccionario_estados_abierta.get(estado_nuevo) # Supongo que da None si no esta en abierta
+        coste_estado_en_abierta = self.diccionario_estados_abierta.get(hash_estado,None) # Supongo que da None si no esta en abierta
 
         if coste_estado_en_abierta != None:
             # Si ya existe en abierta, mirar si el nuevo es mejor
             if coste_f_nuevo < coste_estado_en_abierta:
                 # Si es mejor el nuevo estado, hay que buscar y sacar el viejo de abierta
                 # y meter el nuevo
-                self.diccionario_estados_abierta.pop(estado_nuevo)
-                
-
+                self.diccionario_estados_abierta.pop(hash_estado)
+        
                 if  valor_cabeza != None and valor_cabeza >= coste_estado_en_abierta: # Se busca en la lista donde deberia estar ese estado,prio
                     #print("Metido en lista abierta ")
                     self.lis_abierta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
@@ -800,6 +796,11 @@ class Busqueda():
                         self.lis_abierta_lenta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
                     else:
                         self.lis_abierta_mas_lenta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
+            else:
+                return None
+
+
+        self.diccionario_estados_abierta[hash_estado] = coste_f_nuevo
 
 
         if  valor_cabeza == None or valor_cabeza >= coste_f_nuevo:
@@ -811,7 +812,7 @@ class Busqueda():
                 self.lis_abierta_lenta.insertar(dato=estado_nuevo,prioridad=coste_f_nuevo)
             else:
                 self.lis_abierta_mas_lenta.insertar(dato=estado_nuevo,prioridad=coste_f_nuevo)
-        self.diccionario_estados_abierta.update({estado_nuevo:coste_f_nuevo})
+        
         
         return None
 
@@ -828,7 +829,6 @@ class Busqueda():
         self.lis_abierta_lenta = self.lis_abierta_mas_lenta
         self.lis_abierta_mas_lenta = cola_prio()
         
-
     def expandir(self,estado_sacado,coste_g,valor_cabeza = 9999) -> None:
         """
         Pendiente hacer que haga bastantes distancias,
@@ -909,12 +909,8 @@ class Busqueda():
             else: # Se sube el palet 
                 estado_levantar.asignar_padre(estado_sacado,coste_g1,"S")
 
-
             self.insertar_en_abierta(estado_levantar,coste_f_nuevo,valor_cabeza)
-
-
             self.nodos_expandidos += 1
-
 
     def resolver(self,profundidad= 100,medir_memoria: bool = False):
 
@@ -961,15 +957,7 @@ class Busqueda():
 
             estado_sacado: Estado = estado_coste.dato
             coste_sacado: int = estado_coste.prioridad
-
-            
-            try:
-                self.diccionario_estados_abierta.pop(estado_sacado)
-            except:
-                #print(self.diccionario_estados_abierta)
-                print(estado_sacado,coste_sacado)
-                print("Posible error diccionario lista abierta ciclo ", ciclos)
-                exit()
+            hash_estado: int = hash(estado_sacado)
 
             if ciclos%100 == 0:
                 print("Ciclos: ", ciclos, "Coste F minimo: ",coste_sacado, "Coste H: ", self.heuristica_total(estado_sacado))
@@ -978,10 +966,17 @@ class Busqueda():
             coste_g = 0
 
             if True:
-                self.lis_cerrada.get(estado_sacado)
-                #self.lis_cerrada.append(estado_coste)
 
-                self.lis_cerrada.update({estado_sacado:coste_sacado})
+                try:
+                    self.diccionario_estados_abierta.pop(hash_estado)
+                except:
+                    #print(self.diccionario_estados_abierta)
+                    print("Posible error diccionario lista abierta ciclo ", ciclos)
+                    print("Se intento sacar: ",hash_estado,coste_sacado)
+                    exit()
+
+
+                self.lis_cerrada.update({hash_estado:coste_sacado})
                 c_h = self.heuristica_total(estado_sacado)
                 coste_g: int = estado_sacado.costo_g                         
     
