@@ -405,7 +405,7 @@ class Busqueda():
                 if palet.ang_actual != palet.ang_objetivo:
                     c1 = c1 + 1
 
-                coste = coste + c1
+                coste = coste + self.peso1*c1
 
 
         return coste
@@ -426,7 +426,7 @@ class Busqueda():
                 dist = abs(x_palet-x1) + abs(y_palet-y1)
                 
                 coste = coste + dist
-                
+
         return coste
 
     def heuristica_total(self,estado_comprobar: Estado) -> int:
@@ -443,10 +443,9 @@ class Busqueda():
 
             # Que el robot quiera ir a por los palets que tienen que moverse
             if modo_djistra == False:
-                #coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
-                pass
+                coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
 
-        coste_total = self.peso1*coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
+        coste_total = coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
 
         if modo_djistra:
             if coste_total != 0:

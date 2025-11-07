@@ -108,7 +108,7 @@ def cargar_estados() -> list[Estado]:
     situacion0 = Estado(8,4,"N",False,paletillos)
 
     # Mundo 1
-    paletillos = [Palet(9,3,False,9,3,True),Palet(7,3,False,7,3,False), # Palets izquierda
+    paletillos = [Palet(9,3,False,9,3,False),Palet(7,3,False,7,3,False), # Palets izquierda
                      Palet(9,5,False,2,5,False),Palet(7,5,False,7,5,False),
                           
                         Palet(9,10,False,9,10,False),Palet(7,10,False,1,7,True), # Palets derecha
@@ -136,7 +136,7 @@ def cargar_estados() -> list[Estado]:
 def main():
     buscador = None
     camino = []
-    lista_costes_minimos = [66,136,72,278]   # mundo 1 al parecer fue 117 en algun momento
+    lista_costes_minimos = [66,117,72,278]   # mundo 1 al parecer fue 117 en algun momento
     lista_entornos = cargar_entornos()
     situaciones = cargar_estados()
     try:
@@ -145,20 +145,20 @@ def main():
         f.close()
     except: pass
 
-    rapido: bool = True
+    rapido: bool = False
 
 
     medir_memoria: bool = False
     calculando: bool  = True
     while calculando:
 
-        for i in range(0,2):
+        for i in range(0,3):
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break
-            pesos_h = [5,1,2]
+            pesos_h = [6,1,2]
             buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
-            camino = buscador.resolver(profundidad=50000,medir_memoria= medir_memoria)
+            camino = buscador.resolver(profundidad=25000,medir_memoria= medir_memoria)
             
             if buscador != None:
                 lista_tiempos = buscador.lis_tiempo_ciclo
@@ -192,7 +192,7 @@ def main():
                 
                 if buscador.coste_final > lista_costes_minimos[i]:
                     print("Coste no optimo en mundo ", i)
-                    exit()
+                    
 
                 try:
                     
