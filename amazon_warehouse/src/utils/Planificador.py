@@ -33,6 +33,8 @@ class nodo_cola_prioridad():
 
         return hash((self.dato,self.prioridad))
 
+    def __lt__(self,otro: "nodo_cola_prioridad")-> bool:
+        return self.prioridad < otro.prioridad
 
 #Aqui se crea la cola de prioridad ordenada
 #Los nodos/elementos se van a ordenar de menor a mayor prioridad
@@ -263,6 +265,16 @@ class Palet():
     def __str__(self) -> str:
         return f"Lugar(x={self.pos_x}, y={self.pos_y}, ori='{self.ang_actual}')"
 
+    def necesita_moverse(self) -> bool:
+
+        if self.ang_actual != self.ang_objetivo:
+            return True
+        elif self.pos_x != self.x_objetivo:
+            return True
+        elif self.pos_y != self.y_objetivo:
+            return True
+        
+        return False
 
 
 class Estado():
@@ -408,15 +420,11 @@ class Busqueda():
         lista_palets: "list[Palet]" = estado_comprobar.Lista_estanterias
         
         for palet in lista_palets:
-            x2 = palet.pos_x
-            y2 = palet.pos_y
-            ang_actual_p = palet.ang_actual
-            x3= palet.x_objetivo
-            y3 = palet.y_objetivo
-            ang_obj_p = palet.ang_objetivo
-            
-            if x2 != x3 or y2 != y3 or ang_obj_p!= ang_actual_p:
-                dist = abs(x2-x1) + abs(y2-y1)
+
+            if palet.necesita_moverse():
+                x_palet = palet.pos_x
+                y_palet = palet.pos_y
+                dist = abs(x_palet-x1) + abs(y_palet-y1)
                 coste = coste + dist
             
         return coste
@@ -810,8 +818,17 @@ class Busqueda():
 
     def actualizar_listas_abiertas(self):   
         self.lis_abierta = self.lis_abierta_lenta
+        #tam_lenta2 = len(self.lis_abierta_mas_lenta)
+        #if tam_lenta2 > 0:
+        #    self.lis_abierta_lenta = cola_prio()
+        #    for i in range(0,tam_lenta2,1):
+        #        sacado: nodo_cola_prioridad  = self.lis_abierta_mas_lenta.extraer() #type: ignore
+        #        self.lis_abierta_lenta.insertar(sacado.dato,sacado.prioridad)
+        #else:
+
         self.lis_abierta_lenta = self.lis_abierta_mas_lenta
         self.lis_abierta_mas_lenta = cola_prio()
+        
 
     def expandir(self,estado_sacado,coste_g,valor_cabeza = 9999) -> None:
                 """
@@ -952,7 +969,7 @@ class Busqueda():
 
 
             if ciclos%100 == 0:
-                print("Ciclos: ", ciclos, "Coste F minimo: ",coste_sacado)
+                print("Ciclos: ", ciclos, "Coste F minimo: ",coste_sacado, "Coste H: ", self.heuristica_total(estado_sacado))
 
             ciclos = ciclos+1
             coste_g = 0

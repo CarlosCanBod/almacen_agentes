@@ -47,9 +47,9 @@ def cargar_entornos() -> list[list[list[int]]]:
             [1, 1, 1, 1, 1, 1, 1, 1, 1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1 ,1],# X 0
             [1, 0, 0, 0, 1, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
-            [1, 1, 1, 1, 1, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
+            [1, 1, 1, 1, 1, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,1 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
-            [1, 0, 0, 0, 9, 0, 0, 0, 0 ,0 ,0 ,9 ,1 ,1 ,1 ,0 ,1 ,1 ,1 ,1],# x 5
+            [1, 0, 0, 0, 9, 0, 0, 0, 0 ,0 ,0 ,9 ,1 ,1 ,1 ,0 ,0 ,1 ,1 ,1],# x 5
             [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
             [1, 0, 0, 0, 0, 0, 0, 0, 0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,0 ,1],
@@ -108,7 +108,7 @@ def cargar_estados() -> list[Estado]:
     situacion0 = Estado(8,4,"N",False,paletillos)
 
     # Mundo 1
-    paletillos = [Palet(9,3,False,9,3,False),Palet(7,3,False,7,3,False), # Palets izquierda
+    paletillos = [Palet(9,3,False,9,3,True),Palet(7,3,False,7,3,False), # Palets izquierda
                      Palet(9,5,False,2,5,False),Palet(7,5,False,7,5,False),
                           
                         Palet(9,10,False,9,10,False),Palet(7,10,False,1,7,True), # Palets derecha
@@ -122,11 +122,8 @@ def cargar_estados() -> list[Estado]:
 
 
     # Mundo 3
-    #paletillos = [Palet(21,1,False,2,13,False),Palet(21,3,False,2,15,False),   # Original
-    #              Palet(21,5,False,2,17,False),Palet(2,18,False,21,7,False)]
-
-    paletillos = [Palet(21,1,False,2,13,False),Palet(21,3,False,21,3,False),
-                  Palet(21,5,False,21,5,False),Palet(2,18,False,2,18,False)]
+    paletillos = [Palet(21,2,False,3,13,False),Palet(21,3,False,3,15,False),
+                  Palet(21,5,False,21,6,False),Palet(21,7,False,21,7,False)]
     situacion3 = Estado(1,1,"S",False,paletillos)
 
     # Mundo 4
@@ -139,6 +136,7 @@ def cargar_estados() -> list[Estado]:
 def main():
     buscador = None
     camino = []
+    lista_costes_minimos = [66,117,72,999999]
     lista_entornos = cargar_entornos()
     situaciones = cargar_estados()
     try:
@@ -147,24 +145,21 @@ def main():
         f.close()
     except: pass
 
-    rapido: bool = False
+    rapido: bool = True
 
 
     medir_memoria: bool = False
     calculando: bool  = True
     while calculando:
 
-        for i in range(0,len(situaciones)):
+        for i in range(3,4):
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break
             pesos_h = [5,1,2]
             buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
-
-            
             camino = buscador.resolver(profundidad=30000,medir_memoria= medir_memoria)
             
-
             if buscador != None:
                 lista_tiempos = buscador.lis_tiempo_ciclo
                 if medir_memoria:
@@ -178,6 +173,9 @@ def main():
                 print("Nodos expandidos: ",buscador.nodos_expandidos)
                 print("Tiempo medio ciclo: ", tiempo_medio)
             
+                if buscador.coste_final > lista_costes_minimos[i]:
+                    print("Coste no optimo en mundo ", i)
+                    exit()
 
                 with open("estadisticas.txt","a") as w:
                     w.writelines("Mundo: " + str(i) + "\n")
@@ -194,8 +192,6 @@ def main():
 
                 w.close()
                 
-            
-                
                 try:
                     
                     if medir_memoria:
@@ -204,6 +200,7 @@ def main():
                         savetxt("tiempos_mundo_" + str(i) + ".csv", lista_tiempos, delimiter=",")
                 except:
                     pass
+
 
         if medir_memoria:
             calculando = False
