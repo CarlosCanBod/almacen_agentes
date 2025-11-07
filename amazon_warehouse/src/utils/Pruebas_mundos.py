@@ -152,7 +152,7 @@ def main():
     calculando: bool  = True
     while calculando:
 
-        for i in range(0,3):
+        for i in range(1,2):
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break
