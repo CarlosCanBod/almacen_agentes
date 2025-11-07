@@ -152,13 +152,13 @@ def main():
     calculando: bool  = True
     while calculando:
 
-        for i in range(0,1):
+        for i in range(0,2):
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break
             pesos_h = [5,1,2]
             buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
-            camino = buscador.resolver(profundidad=5000,medir_memoria= medir_memoria)
+            camino = buscador.resolver(profundidad=50000,medir_memoria= medir_memoria)
             
             if buscador != None:
                 lista_tiempos = buscador.lis_tiempo_ciclo

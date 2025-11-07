@@ -127,7 +127,7 @@ class cola_prio():
         except:
             print("Error al introducir elemento en la lista")
 
-    def eliminar(self,dato: Any,prioridad: int) -> None:
+    def eliminar(self,dato: Any,prioridad: int, VALOR_CABEZA:int, trozo: int) -> None:
     
         if self.cabeza != None:
             nodo_actual = self.cabeza   # Se busca aqui el nodo a eliminar
@@ -150,7 +150,7 @@ class cola_prio():
                     if nodo_actual != None:
                         self.cabeza = nodo_actual.siguiente
                         return None
-            print("ERROR NO ENCONTRADO DATO PARA ELIMINAR: ",dato,prioridad)
+            print("ERROR NO ENCONTRADO DATO PARA ELIMINAR: ",hash(dato),prioridad, "TROZO: ",trozo,"  Valor cabeza: ", VALOR_CABEZA)
             return None
 
 
@@ -405,7 +405,7 @@ class Busqueda():
                 if palet.ang_actual != palet.ang_objetivo:
                     c1 = c1 + 1
 
-                coste = coste + self.peso1*c1
+                coste = coste + c1
 
 
         return coste
@@ -424,8 +424,9 @@ class Busqueda():
                 x_palet = palet.pos_x
                 y_palet = palet.pos_y
                 dist = abs(x_palet-x1) + abs(y_palet-y1)
+                
                 coste = coste + dist
-            
+                
         return coste
 
     def heuristica_total(self,estado_comprobar: Estado) -> int:
@@ -442,10 +443,10 @@ class Busqueda():
 
             # Que el robot quiera ir a por los palets que tienen que moverse
             if modo_djistra == False:
-                coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
-                
+                #coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
+                pass
 
-        coste_total = coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
+        coste_total = self.peso1*coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
 
         if modo_djistra:
             if coste_total != 0:
@@ -786,16 +787,15 @@ class Busqueda():
                 # Si es mejor el nuevo estado, hay que buscar y sacar el viejo de abierta
                 # y meter el nuevo
                 self.diccionario_estados_abierta.pop(hash_estado)
-        
                 if  valor_cabeza != None and valor_cabeza >= coste_estado_en_abierta: # Se busca en la lista donde deberia estar ese estado,prio
                     #print("Metido en lista abierta ")
-                    self.lis_abierta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
+                    self.lis_abierta.eliminar(estado_nuevo,coste_estado_en_abierta,valor_cabeza,0)
                 else:
                     valor_cabeza_lenta = self.lis_abierta_lenta.valor_cabeza()
                     if  valor_cabeza != None and valor_cabeza_lenta >= coste_estado_en_abierta:
-                        self.lis_abierta_lenta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
+                        self.lis_abierta_lenta.eliminar(estado_nuevo,coste_estado_en_abierta,valor_cabeza_lenta,1)
                     else:
-                        self.lis_abierta_mas_lenta.eliminar(dato=estado_nuevo,prioridad=coste_estado_en_abierta)
+                        self.lis_abierta_mas_lenta.eliminar(estado_nuevo,coste_estado_en_abierta,valor_cabeza_lenta,2)
             else:
                 return None
 
@@ -947,6 +947,8 @@ class Busqueda():
                 # Si lista abierta esta vacia, se meten todos los datos de la lista lenta
                 print("Metiendo nodos lista lenta a abierta en ciclo ", ciclos)
                 self.actualizar_listas_abiertas()
+
+                valor_cabeza = self.lis_abierta.valor_cabeza()
 
                 estado_coste = self.lis_abierta.extraer()
 
