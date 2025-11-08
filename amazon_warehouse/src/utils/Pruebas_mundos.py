@@ -35,12 +35,14 @@ def cargar_entornos() -> list[list[list[int]]]:
             ]
 
     entorno2 = [
-            [0, 0, 0, 9, 0, 0, 0],
-            [0, 0, 0, 9, 0, 0, 0],
-            [0, 0, 0, 9, 0, 0, 0],
-            [0, 0, 0, 9, 0, 0, 0],
-            [0, 0, 0, 9, 0, 0, 0],
-            [0, 0, 0, 0, 0, 0, 0]
+            [1, 1, 1, 1, 1, 1, 1, 1, 1],
+            [1, 0, 0, 0, 9, 0, 0, 0, 1],
+            [1, 0, 0, 0, 9, 0, 0, 0, 1],
+            [1, 0, 0, 0, 9, 0, 0, 0, 1],
+            [1, 0, 0, 0, 9, 0, 0, 0, 1],
+            [1, 0, 0, 0, 9, 0, 0, 0, 1],
+            [1, 0, 0, 0, 0, 0, 0, 0, 1],
+            [1, 1, 1, 1, 1, 1, 1, 1, 1]
         ]
 
     entorno3 = [
@@ -118,9 +120,8 @@ def cargar_estados() -> list[Estado]:
     situacion1 = Estado(12,7,"N",False,paletillos)
 
     # Mundo 2
-    paletillos = [Palet(4,1,True,1,1,True),Palet(4,5,True,1,5,True)] 
-    situacion2 = Estado(0,2,"E",False,paletillos)
-
+    paletillos = [Palet(5,2,True,2,2,True),Palet(5,6,True,2,6,True)] 
+    situacion2 = Estado(1,3,"E",False,paletillos)
 
     # Mundo 3
     paletillos = [Palet(21,1,False,3,13,False),Palet(21,3,False,21,3,False),
@@ -153,7 +154,7 @@ def main():
     calculando: bool  = True
     while calculando:
 
-        for i in range(4,5):
+        for i in range(0,5):
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break
