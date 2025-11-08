@@ -328,7 +328,7 @@ class Estado():
 
 class Busqueda():
 
-    def __init__(self,estado_inicial: "Estado", entorno: "list[list]",pesos: list[int] = [5,1,2]) -> None:
+    def __init__(self,estado_inicial: "Estado", entorno: "list[list]",pesos: "list[int]" = [5,1,2]) -> None:
         # Mapeo de orientaciones
         self.movimientos = {
             'N': (-1, 0),

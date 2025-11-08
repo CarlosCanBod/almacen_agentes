@@ -24,10 +24,9 @@ catkin_package(
 )
 
 catkin_install_python(PROGRAMS
-  scripts/Class_colas_prioridad.py 
-  scripts/Planificador.py 
   src/utils/obstacles.py
   src/utils/navigation.py
+  src/utils/Planificador.py 
 
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
