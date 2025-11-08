@@ -122,8 +122,8 @@ def cargar_estados() -> list[Estado]:
 
 
     # Mundo 3
-    paletillos = [Palet(21,2,False,3,13,False),Palet(21,3,False,3,15,False),
-                  Palet(21,5,False,21,6,False),Palet(21,7,False,21,7,False)]
+    paletillos = [Palet(21,1,False,3,13,False),Palet(21,3,False,21,3,False),
+                  Palet(21,5,False,21,5,False),Palet(3,13,False,21,1,False)]
     situacion3 = Estado(1,1,"S",False,paletillos)
 
     # Mundo 4
@@ -145,14 +145,14 @@ def main():
         f.close()
     except: pass
 
-    rapido: bool = False
+    rapido: bool = True
 
 
     medir_memoria: bool = False
     calculando: bool  = True
     while calculando:
 
-        for i in range(0,3):
+        for i in range(0,4):
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break
