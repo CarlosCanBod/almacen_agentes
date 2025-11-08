@@ -304,7 +304,9 @@ class Estado():
         if self.estado_padre == None:
             return self.accion
         else:
-            return  self.estado_padre.volver_inicio() + "." + self.accion 
+            return self.estado_padre.volver_inicio() + "." + self.accion 
+
+
 
     def __eq__(self: "Estado", otro_estado: "Estado"):  # type: ignore
 
@@ -996,9 +998,7 @@ class Busqueda():
                             self.imprimir(papi,self.entorno)
                     
                     camino_hecho = estado_sacado.volver_inicio()
-                    print(camino_hecho)
 
-            else:  repetido:bool = True
 
             if repetido == False:
                 self.expandir(estado_sacado,coste_g,valor_cabeza)
