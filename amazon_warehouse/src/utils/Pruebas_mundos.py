@@ -147,7 +147,7 @@ def main():
         f.close()
     except: pass
 
-    rapido: bool = True
+    rapido: bool = False
 
 
     medir_memoria: bool = False
@@ -155,6 +155,10 @@ def main():
     while calculando:
 
         for i in range(0,5):
+            if i > 3:
+                medir_memoria = False
+                rapido = True
+
             if lista_entornos[i] == None:
                 print("Falta entono")
                 break

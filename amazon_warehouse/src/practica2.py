@@ -72,6 +72,7 @@ class Practica1:
 
             situacion1 = pl.Estado(12,7,"N",False,paletillos)
 
+        print("Gazebo no iba bien, se prueban otros mundos en utils/Prueba_mundos.py")
 
         if situacion1 != None:
             buscador = pl.Busqueda(situacion1,entorno)

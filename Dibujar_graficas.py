@@ -5,7 +5,7 @@ from scipy import ndimage
 def main():
 
 
-    for n in range(0,50):
+    for n in range(0,5):
         grafica_uso_memoria: bool = False
         n_mundo = n
         try:
@@ -53,7 +53,8 @@ def main():
                 plt.show()
 
         except Exception as e:
-            pass
+            print("Error:", e)
+            
 
 
 if __name__ == "__main__":
