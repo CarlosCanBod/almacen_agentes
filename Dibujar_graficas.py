@@ -1,6 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import scipy as sp
+from scipy import ndimage
 
 def main():
 
@@ -16,10 +16,18 @@ def main():
 
         try:
             tiempos_ciclo = np.loadtxt("tiempos_mundo_"+ str(n_mundo) + ".csv", delimiter=",")
-            tiempos_ciclo_suavizado = np.convolve(tiempos_ciclo,[0.05,0.15,0.6,0.15,0.05],mode="same")
+
+            if len(tiempos_ciclo) < 5000:
+                radio_gaus: int = 3
+            else:
+                radio_gaus:int = 50
+
+
+            tiempos_ciclo_suavizado = ndimage.gaussian_filter1d(tiempos_ciclo*1000,radio_gaus)
+            #tiempos_ciclo_suavizado = np.convolve(tiempos_ciclo,nucleo,mode="same")
             if grafica_uso_memoria:
                 plt.subplot(2,1,1)
-                plt.plot(tiempos_ciclo_suavizado*1000)
+                plt.plot(tiempos_ciclo_suavizado)
                 plt.title("Tiempos de cálculo por ciclo" + " Mundo " +str(n_mundo))
                 plt.xlabel("Ciclo")
                 plt.ylabel("Tiempo (ms)")
@@ -37,14 +45,14 @@ def main():
         
             else:
                 plt.subplot(1,1,1)
-                plt.plot(tiempos_ciclo*1000)
+                plt.plot(tiempos_ciclo_suavizado)
                 plt.title("Tiempos de cálculo por ciclo" + " Mundo " +str(n_mundo))
                 plt.xlabel("Ciclo")
                 plt.ylabel("Tiempo (ms)")
                 plt.grid()
                 plt.show()
 
-        except:
+        except Exception as e:
             pass
 
 

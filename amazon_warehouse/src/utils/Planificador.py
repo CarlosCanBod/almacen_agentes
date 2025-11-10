@@ -4,8 +4,6 @@ from time import time
 import numpy as np  # Se usa para copiar el entorno para el mapa.
 import matplotlib.pyplot as plt
 import tracemalloc
-
-
 from typing import Any
 
 #Cada elemento/nodo de la lista enlazada 
@@ -242,7 +240,6 @@ buscar_errores: bool = False
 
 # Esto va a hacer que el coste heuristica sea como maximo uno,
 # para que sepa si llega al final. De esta forma solo se usa el costo G.
-modo_djistra:bool = False
 
 
 
@@ -328,7 +325,7 @@ class Estado():
 
 class Busqueda():
 
-    def __init__(self,estado_inicial: "Estado", entorno: "list[list]",pesos: "list[int]" = [5,1,2]) -> None:
+    def __init__(self,estado_inicial: "Estado", entorno: "list[list]",pesos: "list[int]" = [5,1,2], modo_djistra:bool = False) -> None:
         # Mapeo de orientaciones
         self.movimientos = {
             'N': (-1, 0),
@@ -345,6 +342,7 @@ class Busqueda():
         self.peso1 = pesos[0]
         self.peso2 = pesos[1]
         self.peso3 = pesos[2]
+        self.modo_djistra = modo_djistra
 
         self.filas = len(entorno)
         self.columnas = len(entorno[0])
@@ -444,12 +442,12 @@ class Busqueda():
             coste_palets_objetivo: int = (self.heuristica_palets1(estado_comprobar))
 
             # Que el robot quiera ir a por los palets que tienen que moverse
-            if modo_djistra == False:
+            if self.modo_djistra == False:
                 coste_palets_robot = self.heur_robot_palet(estado_comprobar) 
 
         coste_total = coste_palets_objetivo + self.peso2*coste_robot_origen + self.peso3*coste_palets_robot
 
-        if modo_djistra:
+        if self.modo_djistra:
             if coste_total != 0:
                 coste_total = 1
 
@@ -836,9 +834,6 @@ class Busqueda():
         hacer bucle  o algo asi.
         
         """                
-        factor_g: int =1
-
-
 
         #tiempo_in_expandir = time()
         estado_avance: Estado = self.avanzar(estado_sacado)
@@ -849,7 +844,7 @@ class Busqueda():
             else:
                 coste_g1 = coste_g + 1 
                 
-            coste_f_nuevo = coste_h + coste_g1*factor_g
+            coste_f_nuevo = coste_h + coste_g1
 
             estado_avance.asignar_padre(estado_sacado,coste_g1,"A")
 
@@ -868,7 +863,7 @@ class Busqueda():
             else:
                 coste_g1 = coste_g + 2
 
-            coste_f_nuevo = coste_h + coste_g1*factor_g
+            coste_f_nuevo = coste_h + coste_g1
 
             estado_gir_der.asignar_padre(estado_sacado,coste_g1,"GD")
 
@@ -888,7 +883,7 @@ class Busqueda():
             else:
                 coste_g1 = coste_g + 2
             
-            coste_f_nuevo = coste_h + coste_g1*factor_g
+            coste_f_nuevo = coste_h + coste_g1
             estado_gir_izq.asignar_padre(estado_sacado,coste_g1,"GI")
 
 
@@ -903,7 +898,7 @@ class Busqueda():
             coste_h = self.heuristica_total(estado_levantar)
 
             coste_g1 = coste_g + 3
-            coste_f_nuevo = coste_h + coste_g1*factor_g
+            coste_f_nuevo = coste_h + coste_g1
 
             if estado_sacado.Robot_activado: # Si estaba activado ahora se baja
                 estado_levantar.asignar_padre(estado_sacado,coste_g1,"B")

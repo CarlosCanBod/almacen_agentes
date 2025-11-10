@@ -159,7 +159,7 @@ def main():
                 print("Falta entono")
                 break
             pesos_h = [6,1,2]
-            buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h)
+            buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h,modo_djistra=False)
             camino = buscador.resolver(profundidad=300000,medir_memoria= medir_memoria)
             
             if buscador != None:
