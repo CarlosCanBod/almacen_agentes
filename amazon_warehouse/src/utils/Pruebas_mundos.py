@@ -103,7 +103,7 @@ def cargar_entornos() -> list[list[list[int]]]:
 
 
 
-    return [entorno0,entorno1,entorno2,entorno3,entorno4]
+    return [entorno0,entorno2,entorno1,entorno3,entorno4]
 
 def cargar_estados() -> list[Estado]:
     # Mundo 0
@@ -133,12 +133,12 @@ def cargar_estados() -> list[Estado]:
     situacion4 = Estado(1,1,"S",False,paletillos)
 
 
-    return [situacion0,situacion1,situacion2,situacion3,situacion4]
+    return [situacion0,situacion2,situacion1,situacion3,situacion4]
 
 def main():
     buscador = None
     camino = []
-    lista_costes_minimos = [66,117,72,292,370]   # mundo 1 al parecer fue 117 en algun momento
+    lista_costes_minimos = [66,66,117,292,370]   # mundo 1 al parecer fue 117 en algun momento
     lista_entornos = cargar_entornos()
     situaciones = cargar_estados()
     try:
@@ -155,6 +155,8 @@ def main():
     while calculando:
 
         for i in range(0,5):
+            if i > len(lista_entornos):
+                return 0
             if i > 3:
                 medir_memoria = False
                 rapido = True
@@ -217,7 +219,7 @@ def main():
                 calculando = False
             medir_memoria = True
 
-    return None
+    return 0
 
 
 if __name__ == "__main__":
