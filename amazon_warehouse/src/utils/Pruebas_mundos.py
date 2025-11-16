@@ -147,7 +147,7 @@ def main():
         f.close()
     except: pass
 
-    rapido: bool = False
+    rapido: bool = True
 
 
     medir_memoria: bool = False
