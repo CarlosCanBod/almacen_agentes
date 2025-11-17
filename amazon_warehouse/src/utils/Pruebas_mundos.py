@@ -166,7 +166,7 @@ def main():
                 break
             pesos_h = [6,1,2]
             buscador = Busqueda(situaciones[i],lista_entornos[i],pesos=pesos_h,modo_djistra=False)
-            camino = buscador.resolver(profundidad=300000,medir_memoria= medir_memoria)
+            camino = buscador.resolver(profundidad=1200000,limite_tiempo=900,medir_memoria= medir_memoria)
             
             if buscador != None:
                 lista_tiempos = buscador.lis_tiempo_ciclo
@@ -200,7 +200,7 @@ def main():
                 
                 if buscador.coste_final > lista_costes_minimos[i]:
                     print("Coste no optimo en mundo ", i)
-                    exit()
+                    #exit()
 
                 try:
                     

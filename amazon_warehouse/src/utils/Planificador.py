@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-from typing import Any
 from time import time
 import numpy as np  # Se usa para copiar el entorno para el mapa.
 import matplotlib.pyplot as plt
@@ -149,6 +148,7 @@ class ColaPrio:
                     if nodo_actual is not None:
                         self.cabeza = nodo_actual.siguiente
                         return None
+
             print("ERROR NO ENCONTRADO DATO PARA ELIMINAR: ", hash(dato), prioridad, "TROZO: ", trozo,"  Valor cabeza: ", valor_cabeza)
             return None
         return None
@@ -278,12 +278,12 @@ class Palet:
 
 
 class Estado:
-    def __init__(self,R_x:int ,R_y:int ,R_ang:str ,R_levantado: bool, Lista_palets: "list[Palet]" ) -> None:    
-        self.Robot_x:int = R_x
-        self.Robot_y:int = R_y
-        self.Robot_orientacion: str = R_ang
-        self.Robot_activado:bool = R_levantado
-        self.Lista_estanterias: "list[Palet]" = Lista_palets
+    def __init__(self, r_x:int, r_y:int, r_ang:str, r_levantado: bool, lista_palets: "list[Palet]") -> None:
+        self.Robot_x:int = r_x
+        self.Robot_y:int = r_y
+        self.Robot_orientacion: str = r_ang
+        self.Robot_activado:bool = r_levantado
+        self.Lista_estanterias: "list[Palet]" = lista_palets
 
         self.estado_padre: Any = None
         self.costo_g: int = 0
@@ -460,8 +460,7 @@ class Busqueda:
 
         Va a invertir el estado que tenga.
         """
-        
-        
+
         cord_robot_x: int  = estado.Robot_x
         cord_robot_y: int = estado.Robot_y
         robot_angulo: str = estado.Robot_orientacion
@@ -483,7 +482,7 @@ class Busqueda:
             Gira el robot a la izquierda
             Si no tiene palet no hay requisitos para girar
 
-            Si lo hay, no puede haber nada alrededor de la posicion del robot
+            Si lo hay, no puede haber obstaculos o palets alrededor del robot.
         
         """
 
@@ -511,9 +510,6 @@ class Busqueda:
             # No pueden girar si tienen bloque, pero si pared cerca
             for ancho in range(-1,2):
                 for alto in range(-1,2):
-                    #if ancho == 1 and alto == 0:
-                    #    print("ENTORNO AL SUR: ", self.entorno[cord_robot_x +ancho][cord_robot_y+alto])
-                    #print(ancho)
                     try:
                         if self.entorno[cord_robot_x +ancho][cord_robot_y + alto] == 9:
                             return None
@@ -521,7 +517,6 @@ class Busqueda:
                         pass
 
             # Que no pueda girar en los bordes con palet
-            # REVISAR QUE NO ELIMINE CAMINOS CORRECTOS
             if cord_robot_x == 0 or cord_robot_x == self.filas-1:
                 #print("GIRO ILEGAL")
                 return None
@@ -530,26 +525,23 @@ class Busqueda:
                 return None
 
             lista_palets_quietos: "list[Palet] " = []   
-            Palet_girado = None     #type:ignore
+            palet_girado = None     #type:ignore
 
             for palet in lis_estanterias_copia:
 
                 # Gira el palet si es el que esta en la posicion del robot
                 if palet.pos_x == cord_robot_x and palet.pos_y == cord_robot_y:
 
-                    Pal_pos_x = palet.pos_x; Pal_obj_x = palet.x_objetivo
-                    Pal_pos_y = palet.pos_y; Pal_obj_y = palet.y_objetivo
-                    Pal_ang_act = not palet.ang_actual ; Pal_obj_ang = palet.ang_objetivo
+                    pal_pos_x = palet.pos_x; pal_obj_x = palet.x_objetivo
+                    pal_pos_y = palet.pos_y; pal_obj_y = palet.y_objetivo
+                    pal_ang_act = not palet.ang_actual ; pal_obj_ang = palet.ang_objetivo
                     
 
-                    Palet_girado: Palet = Palet(Pal_pos_x,Pal_pos_y,Pal_ang_act,
-                                                Pal_obj_x,Pal_obj_y,Pal_obj_ang)
+                    palet_girado: Palet = Palet(pal_pos_x,pal_pos_y,pal_ang_act,
+                                                pal_obj_x,pal_obj_y,pal_obj_ang)
                     if buscar_errores:
                         print("GIRADO",cord_robot_x, " y ",cord_robot_y)
                         print("PALET EN X ",palet.pos_x, " y ",palet.pos_y, "PASA DE ", palet.ang_actual, "A ", not palet.ang_actual )
-
-                    
-
 
                 else:
 
@@ -561,8 +553,8 @@ class Busqueda:
                                 return None
                     lista_palets_quietos.append(palet)        
                     
-            if Palet_girado is not None:
-                lista_palets_quietos.append(Palet_girado)
+            if palet_girado is not None:
+                lista_palets_quietos.append(palet_girado)
 
                 if buscar_errores:
                     print("Estado nuevo giro palet")
@@ -576,8 +568,6 @@ class Busqueda:
         Rob_pos_y= estado.Robot_y
         Rang = estado.Robot_orientacion
         R_levan = estado.Robot_activado
-
-
 
         # Mira a que posicion cambia el robot si avanza, mirando la orientacion
         dx, dy = self.movimientos[Rang]
@@ -620,15 +610,11 @@ class Busqueda:
         # Si el robot está levantado tiene estanteria, por lo que  hay que hacer más comprobaciones.
         else:    # Si no lleva palet
 
-
             if lista_palets_copia is None:
                 print("Error, palet desaparecio")
 
                 self.imprimir(estado,self.entorno)
                 exit()
-
-
-
 
             lleva_vertical: bool = False
             
@@ -667,14 +653,11 @@ class Busqueda:
             # Con la nueva posicion del palet miramos si no choca con otro palet o obstaculo
             # Utilizo la posicion del robot, si el palet que lleva esta en vertical, hay que mirar arriba y abajo,
             # si es horizontal a la izquierda y derecha de el.
-            
             if lleva_vertical:
 
                 if Ry_n == 0 or Ry_n == self.filas -1 :
                     return None
-                 
 
-                # QUITAR ESTE TRY POR ALGO BUENO 
                 try:
                     if 0 > Rx_n >= self.filas  or 0 > Ry_n + 1 >= self.columnas or self.entorno[Rx_n][Ry_n+1] == 9:
                         return None
@@ -728,7 +711,6 @@ class Busqueda:
                      # Que no se meta en otro palet
                     if Rx_n == palet.pos_x and Ry_n == palet.pos_y:
                         return None
-                    
 
                     if palet.ang_actual == 0: # Si el otro palet esta en horizontal
 
@@ -743,21 +725,13 @@ class Busqueda:
                             for alto in range(-1,1):
                                 if Rx_n == palet.pos_x +ancho and Ry_n == palet.pos_y + alto:
                                     return None
-                
-
 
             lista_palets_nueva = lista_palets_quietos
             if Palet_movido is not None:
-                
                 lista_palets_nueva.append(Palet_movido)
 
 
-                #print("Se devuelve: ", type(lista_palets_nueva)) 
-                #self.imprimir(Estado(Rx_n,Ry_n,Rang,R_levan,Lista_palets=lista_palets_nueva) ,self.entorno)
-                #print("Fin devolver")
-
-
-        return Estado(Rx_n,Ry_n,Rang,R_levan,Lista_palets=lista_palets_nueva) 
+        return Estado(Rx_n, Ry_n, Rang, R_levan, lista_palets=lista_palets_nueva)
 
 
     def insertar_en_abierta(self,estado_nuevo: Estado,coste_f_nuevo:int,valor_cabeza:int) -> None:
@@ -817,25 +791,11 @@ class Busqueda:
 
     def actualizar_listas_abiertas(self):   
         self.lis_abierta = self.lis_abierta_lenta
-        #tam_lenta2 = len(self.lis_abierta_mas_lenta)
-        #if tam_lenta2 > 0:
-        #    self.lis_abierta_lenta = cola_prio()
-        #    for i in range(0,tam_lenta2,1):
-        #        sacado: nodo_cola_prioridad  = self.lis_abierta_mas_lenta.extraer() #type: ignore
-        #        self.lis_abierta_lenta.insertar(sacado.dato,sacado.prioridad)
-        #else:
-
         self.lis_abierta_lenta = self.lis_abierta_mas_lenta
         self.lis_abierta_mas_lenta = ColaPrio()
         
     def expandir(self,estado_sacado,coste_g,valor_cabeza = 9999) -> None:
-        """
-        Pendiente hacer que haga bastantes distancias,
-        hacer bucle  o algo asi.
-        
-        """                
 
-        #tiempo_in_expandir = time()
         estado_avance: Estado = self.avanzar(estado_sacado)
         if estado_avance is not None:
             coste_h = self.heuristica_total(estado_avance)
@@ -908,7 +868,7 @@ class Busqueda:
             self.insertar_en_abierta(estado_levantar,coste_f_nuevo,valor_cabeza)
             self.nodos_expandidos += 1
 
-    def resolver(self,profundidad= 100,medir_memoria: bool = False):
+    def resolver(self,profundidad= 100,limite_tiempo = 800,medir_memoria: bool = False):
 
         if medir_memoria:
             tracemalloc.start()    
@@ -918,95 +878,101 @@ class Busqueda:
         estado_sacado = None    #type: ignore
         estado_coste = None  #type: ignore
         camino_hecho = None
+        tiempo_inicio_bucle = 0.0
         self.nodos_expandidos: int = 0
         self.tiempo_total: float = 0.0
         self.coste_final: int = 0
-        
 
         tiempo_inicio = time()
 
+        try:
+            while  (profundidad > ciclos) and Exito == False:
+                tiempo_inicio_bucle = time()
 
-        #print("INICIAL DIBUJO", self.estado_ini.Lista_estanterias[0].ang_actual)
-        #self.imprimir(self.estado_ini,self.entorno)
 
-        while  (profundidad > ciclos) and Exito == False:
-            tiempo_inicio_bucle = time()
-        
-
-            repetido:bool = False
-
-            valor_cabeza = self.lis_abierta.valor_cabeza()
-
-            if not self.lis_abierta.vacio():
-                estado_coste = self.lis_abierta.extraer()
-            else:
-                # Si lista abierta esta vacia, se meten todos los datos de la lista lenta
-                print("Metiendo nodos lista lenta a abierta en ciclo ", ciclos)
-                self.actualizar_listas_abiertas()
+                repetido:bool = False
 
                 valor_cabeza = self.lis_abierta.valor_cabeza()
 
-                estado_coste = self.lis_abierta.extraer()
+                if not self.lis_abierta.vacio():
+                    estado_coste = self.lis_abierta.extraer()
+                else:
+                    # Si lista abierta esta vacia, se meten todos los datos de la lista lenta
+                    print("Metiendo nodos lista lenta a abierta en ciclo ", ciclos)
+                    self.actualizar_listas_abiertas()
+
+                    valor_cabeza = self.lis_abierta.valor_cabeza()
+
+                    estado_coste = self.lis_abierta.extraer()
 
 
-            if estado_coste is None:
-                print("Lista abierta vacia, no hay mas estados que expandir")
-                break
+                if estado_coste is None:
+                    print("Lista abierta vacia, no hay mas estados que expandir")
+                    break
 
-            estado_sacado: Estado = estado_coste.dato
-            coste_sacado: int = estado_coste.prioridad
-            hash_estado: int = hash(estado_sacado)
+                estado_sacado: Estado = estado_coste.dato
+                coste_sacado: int = estado_coste.prioridad
+                hash_estado: int = hash(estado_sacado)
 
-            if ciclos%100 == 0:
-                print("Ciclos: ", ciclos, "Coste F minimo: ",coste_sacado, "Coste H: ", self.heuristica_total(estado_sacado))
+                if ciclos%100 == 0:
+                    print("Ciclos: ", ciclos, "Coste F minimo: ",coste_sacado, "Coste H: ", self.heuristica_total(estado_sacado))
+                    if limite_tiempo < time() - tiempo_inicio:
+                        print("Se pasa tiempo maximo, se sale")
+                        break
 
-            ciclos = ciclos+1
-            coste_g = 0
+                ciclos = ciclos+1
+                coste_g = 0
 
-            if True:
+                if True:
 
-                try:
-                    self.diccionario_estados_abierta.pop(hash_estado)
-                except:
-                    #print(self.diccionario_estados_abierta)
-                    print("Posible error diccionario lista abierta ciclo ", ciclos)
-                    print("Se intento sacar: ",hash_estado,coste_sacado)
-                    exit()
-
-
-                self.lis_cerrada.update({hash_estado:coste_sacado})
-                c_h = self.heuristica_total(estado_sacado)
-                coste_g: int = estado_sacado.costo_g                         
-    
-                if c_h == 0:
-                    Exito = True
-                    repetido = True # Para que no expanda una vez tenga exito
-
-                    self.coste_final = coste_g
-                    self.estado_final = estado_sacado
-
-                    if buscar_errores:
-                        papi: Estado = estado_sacado.estado_padre
-                        while papi.estado_padre is not None:
-                            papi = papi.estado_padre
-                            print("PADRE",papi.Lista_estanterias[0].ang_actual)
-                            self.imprimir(papi,self.entorno)
-                    
-                    camino_hecho = estado_sacado.volver_inicio()
+                    try:
+                        self.diccionario_estados_abierta.pop(hash_estado)
+                    except:
+                        #print(self.diccionario_estados_abierta)
+                        print("Posible error diccionario lista abierta ciclo ", ciclos)
+                        print("Se intento sacar: ",hash_estado,coste_sacado)
+                        exit()
 
 
-            if repetido == False:
-                self.expandir(estado_sacado,coste_g,valor_cabeza)
-          
+                    self.lis_cerrada.update({hash_estado:coste_sacado})
+                    c_h = self.heuristica_total(estado_sacado)
+                    coste_g: int = estado_sacado.costo_g
 
-       
-            repetido:bool = False
-            if medir_memoria:
-                mem = tracemalloc.get_traced_memory()[0]
-                self.lis_memoria_ciclo.append(mem)
-            else:
-                self.lis_tiempo_ciclo.append(time() - tiempo_inicio_bucle)
-       
+                    if c_h == 0:
+                        Exito = True
+                        repetido = True # Para que no expanda una vez tenga exito
+
+                        self.coste_final = coste_g
+                        self.estado_final = estado_sacado
+
+                        if buscar_errores:
+                            papi: Estado = estado_sacado.estado_padre
+                            while papi.estado_padre is not None:
+                                papi = papi.estado_padre
+                                print("PADRE",papi.Lista_estanterias[0].ang_actual)
+                                self.imprimir(papi,self.entorno)
+
+                        camino_hecho = estado_sacado.volver_inicio()
+
+
+
+
+                if not repetido:
+                    self.expandir(estado_sacado,coste_g,valor_cabeza)
+
+                if medir_memoria:
+                    mem = tracemalloc.get_traced_memory()[0]
+                    self.lis_memoria_ciclo.append(mem)
+                else:
+                    self.lis_tiempo_ciclo.append(time() - tiempo_inicio_bucle)
+
+
+        except KeyboardInterrupt:
+            print("Saliendo de busqueda de forma manual")
+
+        except Exception as e:
+            print("Error buscando solucion", e)
+
 
         if len(self.lis_abierta) == 0 and Exito == False:
             print("Error, no se encontro solucion")
@@ -1014,6 +980,7 @@ class Busqueda:
         print("Encontrado solucion: ", Exito)
 
         self.tiempo_total = time() - tiempo_inicio
+
 
         # Longitud camino
         if camino_hecho is not None:
@@ -1064,17 +1031,11 @@ class Busqueda:
                         except:
                             pass
 
-
                     if palet.pos_x == estado.Robot_x and estado.Robot_y == palet.pos_y:
                         if estado.Robot_activado:
                             mapa[palet.pos_x][palet.pos_y] = 4
                         else:
                             mapa[palet.pos_x][palet.pos_y] = 3
-
-
-        #print("robot x: ",estado.Robot_x)
-        #print("robot y: ",estado.Robot_y)
-        #print("Orientacion: ",estado.Robot_orientacion)
 
         for fila in mapa:
             print(fila)
@@ -1084,7 +1045,6 @@ class Busqueda:
 def main():
     mundo_simulado = 2
     buscador = None
-    camino = 0
 
     if mundo_simulado == 0 and buscar_errores == False:
         print("Mundo 0")
