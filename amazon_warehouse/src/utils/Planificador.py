@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from time import time
 import numpy as np  # Se usa para copiar el entorno para el mapa.
+# noinspection package-requirements
 import matplotlib.pyplot as plt
 import tracemalloc
 from typing import Any
