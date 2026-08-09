@@ -4,7 +4,7 @@ from random import randint
 
 from utils.Planificador import NodoColaPrioridad,ColaPrio,Busqueda, Estado,Palet
 
-class TestClass(unittest.TestCase):
+class TestColaPrio(unittest.TestCase):
 
     def test_hola(self):
         cola = ColaPrio()
@@ -18,7 +18,7 @@ class TestClass(unittest.TestCase):
 
     def test_insertar_mucho(self):
         cola = ColaPrio()
-        tamano: int  = 10
+        tamano: int  = 100
 
         for i in range(tamano):
             cola.insertar(randint(0,50),randint(0,50))
@@ -37,6 +37,9 @@ class TestClass(unittest.TestCase):
         for i in range(1,tamano+1):
             nodo: Any = cola.extraer()
             self.assertEqual(nodo.dato,5*i)
+
+
+class TestBusqueda(unittest.TestCase):
 
     def test_expansion(self):
 
