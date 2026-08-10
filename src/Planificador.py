@@ -87,26 +87,6 @@ class Busqueda:
 
         return coste
 
-    @staticmethod
-    def heur_robot_palet(estado_comprobar: Estado):
-
-        coste = 0
-        x1 = estado_comprobar.Robot_x
-        y1 = estado_comprobar.Robot_y
-
-        lista_palets: "list[Palet]" = estado_comprobar.Lista_estanterias
-
-        for palet in lista_palets:
-
-            if palet.necesita_moverse():
-                x_palet = palet.pos_x
-                y_palet = palet.pos_y
-                dist = abs(x_palet - x1) + abs(y_palet - y1)
-
-                coste = coste + dist
-
-        return coste
-
     def heuristica_total(self, estado_comprobar: Estado) -> int:
 
         coste_palets_robot = 0
@@ -121,7 +101,7 @@ class Busqueda:
 
             # Que el robot quiera ir a por los palets que tienen que moverse
             if not self.modo_djistra:
-                coste_palets_robot = self.heur_robot_palet(estado_comprobar)
+                coste_palets_robot = heur_robot_palet(estado_comprobar)
 
         coste_total = coste_palets_objetivo + self.peso2 * coste_robot_origen + self.peso3 * coste_palets_robot
 
@@ -130,30 +110,6 @@ class Busqueda:
                 coste_total = 1
 
         return coste_total
-
-    @staticmethod
-    def levantar_bajar(estado: Estado) -> Any:
-        """
-        Tiene que estar debajo de un palet para poder usar esto,
-        si no, no sube o baja.
-
-        Va a invertir el estado que tenga.
-        """
-
-        cord_robot_x: int = estado.Robot_x
-        cord_robot_y: int = estado.Robot_y
-        robot_angulo: str = estado.Robot_orientacion
-        rob_activado: bool = estado.Robot_activado
-        lis_estanterias: "list[Palet]" = estado.Lista_estanterias.copy()
-
-        for palet in lis_estanterias:
-            if cord_robot_x == palet.pos_x and cord_robot_y == palet.pos_y:
-                rob_activado = not rob_activado
-                estado_nuevo: Estado = Estado(cord_robot_x, cord_robot_y, robot_angulo, rob_activado, lis_estanterias)
-                return estado_nuevo
-
-        # Si no ha encontrado un palet encima del robot, no se devuelve estado
-        return None
 
     def girar(self, estado: Estado, izquierda: bool = True) -> Any:
         """
@@ -266,7 +222,7 @@ class Busqueda:
         if not R_levan:
             # Comprobar que el robot no choca con patas de alguna estanteria
             for palet in lista_palets_copia:
-                if palet.ang_actual == 1:  # Si el palet esta en vertical
+                if palet.ang_actual:  # Si el palet esta en vertical
                     # Al estar en vertical el robot no se puede mover 1 encima o debajo
                     # de la posicion del palet
                     if palet.pos_x == Rx_n and (palet.pos_y + 1 == Ry_n or palet.pos_y - 1 == Ry_n):
@@ -338,7 +294,7 @@ class Busqueda:
                     if Rx_n == palet.pos_x and Ry_n == palet.pos_y:
                         return None
 
-                    if palet.ang_actual == 1:  # Si el otro palet esta en vertical
+                    if palet.ang_actual:  # Si el otro palet esta en vertical
 
                         # Al estar en vertical el robot no se puede mover 1 encima o debajo
                         # de la posicion del palet
@@ -373,7 +329,7 @@ class Busqueda:
                     if Rx_n == palet.pos_x and Ry_n == palet.pos_y:
                         return None
 
-                    if palet.ang_actual == 0:  # Si el otro palet esta en horizontal
+                    if not palet.ang_actual:  # Si el otro palet esta en horizontal
 
                         # Al estar en horizontal el robot no se puede mover 1 der o izquierda
                         # de la posicion del palet
@@ -503,7 +459,7 @@ class Busqueda:
 
             self.nodos_expandidos += 1
 
-        estado_levantar: Estado = self.levantar_bajar(estado_sacado)
+        estado_levantar: Estado | None = levantar_bajar(estado_sacado)
         if estado_levantar is not None:
             coste_h = self.heuristica_total(estado_levantar)
 
@@ -613,8 +569,52 @@ class Busqueda:
         return camino_hecho
 
 
+def levantar_bajar(estado: Estado) -> Estado | None:
+    """
+    Tiene que estar debajo de un palet para poder usar esto,
+    si no, no sube o baja.
+
+    Va a invertir el estado que tenga rob_activado.
+    """
+
+    cord_robot_x: int = estado.Robot_x
+    cord_robot_y: int = estado.Robot_y
+    robot_angulo: str = estado.Robot_orientacion
+    rob_activado: bool = estado.Robot_activado
+    lis_estanterias: "list[Palet]" = estado.Lista_estanterias.copy()
+
+    for palet in lis_estanterias:
+        if cord_robot_x == palet.pos_x and cord_robot_y == palet.pos_y:
+            rob_activado = not rob_activado
+            estado_nuevo: Estado = Estado(cord_robot_x, cord_robot_y, robot_angulo, rob_activado, lis_estanterias)
+            return estado_nuevo
+
+    # Si no ha encontrado un palet encima del robot, no se devuelve estado
+    return None
+
+
+def heur_robot_palet(estado_comprobar: Estado):
+
+    coste = 0
+    x1 = estado_comprobar.Robot_x
+    y1 = estado_comprobar.Robot_y
+
+    lista_palets: "list[Palet]" = estado_comprobar.Lista_estanterias
+
+    for palet in lista_palets:
+
+        if palet.necesita_moverse():
+            x_palet = palet.pos_x
+            y_palet = palet.pos_y
+            dist = abs(x_palet - x1) + abs(y_palet - y1)
+
+            coste = coste + dist
+
+    return coste
+
+
 def main():
-  pass
+    pass
 
 
 if __name__ == "__main__":
