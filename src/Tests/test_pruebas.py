@@ -4,7 +4,7 @@ from random import randint
 
 from EstructurasDatos.ColaPrioridad import NodoColaPrioridad, ColaPrio
 from EstructurasDatos.Objetos import Palet, Estado
-from Planificador import Busqueda
+from Planificador import Busqueda, girar, levantar_bajar
 
 
 class TestColaPrio(unittest.TestCase):
@@ -52,11 +52,30 @@ class TestBusqueda(unittest.TestCase):
 
         buscador = Busqueda(estado_inicial, entorno)
 
-        estado_nuevo: Estado = buscador.avanzar(estado_inicial)
+        estado_nuevo: Any = buscador.avanzar(estado_inicial)
 
+        self.assertIsNotNone(estado_nuevo)
         # Avanzar hacia abajo
         self.assertEqual(1, estado_nuevo.Robot_x)
         self.assertEqual(0, estado_nuevo.Robot_y)
+
+    def test_girar(self):
+        lista_palets = [Palet(2, 2, False, 1, 1, False)]
+
+        estado_inicial = Estado(0, 0, "S", False, lista_palets)
+
+        entorno = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+        estado_girado: Estado = girar(estado_inicial, entorno, izquierda=True)
+
+        # Comprobacion girar 360 de forma legal, sin palet.
+        self.assertEqual(estado_girado.Robot_orientacion, "E")
+        estado_girado: Estado = girar(estado_girado, entorno, izquierda=True)
+        self.assertEqual(estado_girado.Robot_orientacion, "N")
+        estado_girado: Estado = girar(estado_girado, entorno, izquierda=True)
+        self.assertEqual(estado_girado.Robot_orientacion, "O")
+        estado_girado: Estado = girar(estado_girado, entorno, izquierda=True)
+        self.assertEqual(estado_girado.Robot_orientacion, "S")
 
 
 if __name__ == "__main__":

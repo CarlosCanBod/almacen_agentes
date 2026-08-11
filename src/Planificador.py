@@ -18,8 +18,6 @@ class Busqueda:
             'E': (0, 1),
             'O': (0, -1)
         }
-        self.rotar_izquierda = {'N': 'O', 'O': 'S', 'S': 'E', 'E': 'N'}
-        self.rotar_derecha = {'N': 'E', 'E': 'S', 'S': 'O', 'O': 'N'}
 
         self.estado_ini = estado_inicial
         self.estado_actual = estado_inicial
@@ -111,87 +109,7 @@ class Busqueda:
 
         return coste_total
 
-    def girar(self, estado: Estado, izquierda: bool = True) -> Any:
-        """
-            Gira el robot a la izquierda
-            Si no tiene palet no hay requisitos para girar
-
-            Si lo hay, no puede haber obstaculos o palets alrededor del robot.
-        
-        """
-
-        cord_robot_x: int = estado.Robot_x
-        cord_robot_y: int = estado.Robot_y
-        robot_angulo: str = estado.Robot_orientacion
-        rob_activado: bool = estado.Robot_activado
-        lis_estanterias_copia: "list[Palet]" = estado.Lista_estanterias.copy()
-
-        if izquierda:
-            robot_angulo = self.rotar_izquierda[robot_angulo]
-        else:
-            robot_angulo = self.rotar_derecha[robot_angulo]
-
-        if not rob_activado:
-
-            estado_nuevo: Estado = Estado(cord_robot_x, cord_robot_y, robot_angulo, rob_activado, lis_estanterias_copia)
-            return estado_nuevo
-
-        else:
-
-            # Si lleva palet hay que hacer mas comprobaciones
-            # Que no este cerca de algun obstaculo 
-            # Los obstaculos tienen valor 9 en entorno, y paredes 1 por ejemplo
-            # No pueden girar si tienen bloque, pero si pared cerca
-            for ancho in range(-1, 2):
-                for alto in range(-1, 2):
-                    try:
-                        if self.entorno[cord_robot_x + ancho][cord_robot_y + alto] == 9:
-                            return None
-                    except Exception as e:
-                        print("ERROR GIRAR: ", e)
-                        pass
-
-            # Que no pueda girar en los bordes con palet
-            if cord_robot_x == 0 or cord_robot_x == self.filas - 1:
-                return None
-            if cord_robot_y == 0 or cord_robot_y == self.columnas - 1:
-                return None
-
-            lista_palets_quietos: "list[Palet] " = []
-            palet_girado = None
-
-            for palet in lis_estanterias_copia:
-
-                # Gira el palet si es el que esta en la posicion del robot
-                if palet.pos_x == cord_robot_x and palet.pos_y == cord_robot_y:
-
-                    pal_pos_x = palet.pos_x
-                    pal_obj_x = palet.x_objetivo
-                    pal_pos_y = palet.pos_y
-                    pal_obj_y = palet.y_objetivo
-                    pal_ang_act = not palet.ang_actual
-                    pal_obj_ang = palet.ang_objetivo
-
-                    palet_girado: Palet = Palet(pal_pos_x, pal_pos_y, pal_ang_act,
-                                                pal_obj_x, pal_obj_y, pal_obj_ang)
-
-                else:
-
-                    # Si no es el palet que lleva
-                    # Mira alrededor del otro palet, no se puede girar ahi.
-                    for ancho in range(-1, 1):
-                        for alto in range(-1, 1):
-                            if cord_robot_x == palet.pos_x + ancho and cord_robot_y == palet.pos_y + alto:
-                                return None
-                    lista_palets_quietos.append(palet)
-
-            if palet_girado is not None:
-                lista_palets_quietos.append(palet_girado)
-
-            estado_nuevo: Estado = Estado(cord_robot_x, cord_robot_y, robot_angulo, rob_activado, lista_palets_quietos)
-            return estado_nuevo
-
-    def avanzar(self, estado: Estado) -> Any:
+    def avanzar(self, estado: Estado) -> Estado | None:
 
         Rob_pos_x = estado.Robot_x
         Rob_pos_y = estado.Robot_y
@@ -410,7 +328,7 @@ class Busqueda:
 
     def expandir(self, estado_sacado, coste_g, valor_cabeza=9999) -> None:
 
-        estado_avance: Estado = self.avanzar(estado_sacado)
+        estado_avance: Estado | None = self.avanzar(estado_sacado)
         if estado_avance is not None:
             coste_h = self.heuristica_total(estado_avance)
             if estado_avance.Robot_activado:
@@ -426,7 +344,7 @@ class Busqueda:
 
             self.nodos_expandidos += 1
 
-        estado_gir_der: Estado = self.girar(estado_sacado, False)
+        estado_gir_der: Estado = girar(estado_sacado, self.entorno, False)
         if estado_gir_der is not None:
             coste_h = self.heuristica_total(estado_gir_der)
 
@@ -443,7 +361,7 @@ class Busqueda:
 
             self.nodos_expandidos += 1
 
-        estado_gir_izq: Estado = self.girar(estado_sacado, True)
+        estado_gir_izq: Estado = girar(estado_sacado, self.entorno, True)
         if estado_gir_izq is not None:
             coste_h = self.heuristica_total(estado_gir_izq)
 
@@ -593,8 +511,93 @@ def levantar_bajar(estado: Estado) -> Estado | None:
     return None
 
 
-def heur_robot_palet(estado_comprobar: Estado):
+def girar(estado: Estado, entorno: list[list[int]], izquierda: bool = True) -> Any:
+    """
+        Gira el robot a la izquierda
+        Si no tiene palet no hay requisitos para girar
 
+        Si lo hay, no puede haber obstaculos o palets alrededor del robot.
+
+    """
+
+    cord_robot_x: int = estado.Robot_x
+    cord_robot_y: int = estado.Robot_y
+    robot_angulo: str = estado.Robot_orientacion
+    rob_activado: bool = estado.Robot_activado
+    lis_estanterias_copia: "list[Palet]" = estado.Lista_estanterias.copy()
+    rotar_izquierda = {'N': 'O', 'O': 'S', 'S': 'E', 'E': 'N'}
+    rotar_derecha = {'N': 'E', 'E': 'S', 'S': 'O', 'O': 'N'}
+
+    if izquierda:
+        robot_angulo = rotar_izquierda[robot_angulo]
+    else:
+        robot_angulo = rotar_derecha[robot_angulo]
+
+    if not rob_activado:
+
+        estado_nuevo: Estado = Estado(cord_robot_x, cord_robot_y, robot_angulo, rob_activado, lis_estanterias_copia)
+        return estado_nuevo
+
+    else:
+
+        # Si lleva palet hay que hacer mas comprobaciones
+        # Que no este cerca de algun obstaculo
+        # Los obstaculos tienen valor 9 en entorno, y paredes 1 por ejemplo
+        # No pueden girar si tienen bloque, pero si pared cerca
+        for ancho in range(-1, 2):
+            for alto in range(-1, 2):
+                try:
+                    if entorno[cord_robot_x + ancho][cord_robot_y + alto] == 9:
+                        return None
+                except Exception as e:
+                    print("ERROR GIRAR: ", e)
+                    pass
+
+        filas = len(entorno)
+        columnas = len(entorno[0])
+
+        # Que no pueda girar en los bordes con palet
+        if cord_robot_x == 0 or cord_robot_x == filas - 1:
+            return None
+        if cord_robot_y == 0 or cord_robot_y == columnas - 1:
+            return None
+
+        lista_palets_quietos: "list[Palet] " = []
+        palet_girado = None
+
+        for palet in lis_estanterias_copia:
+
+            # Gira el palet si es el que esta en la posicion del robot
+            if palet.pos_x == cord_robot_x and palet.pos_y == cord_robot_y:
+
+                pal_pos_x = palet.pos_x
+                pal_obj_x = palet.x_objetivo
+                pal_pos_y = palet.pos_y
+                pal_obj_y = palet.y_objetivo
+                pal_ang_act = not palet.ang_actual
+                pal_obj_ang = palet.ang_objetivo
+
+                palet_girado: Palet = Palet(pal_pos_x, pal_pos_y, pal_ang_act,
+                                            pal_obj_x, pal_obj_y, pal_obj_ang)
+
+            else:
+
+                # Si no es el palet que lleva
+                # Mira alrededor del otro palet, no se puede girar ahi.
+                for ancho in range(-1, 1):
+                    for alto in range(-1, 1):
+                        if cord_robot_x == palet.pos_x + ancho and cord_robot_y == palet.pos_y + alto:
+                            return None
+                lista_palets_quietos.append(palet)
+
+        if palet_girado is not None:
+            lista_palets_quietos.append(palet_girado)
+
+        estado_nuevo: Estado = Estado(cord_robot_x, cord_robot_y, robot_angulo, rob_activado, lista_palets_quietos)
+        return estado_nuevo
+
+
+def heur_robot_palet(estado_comprobar: Estado):
     coste = 0
     x1 = estado_comprobar.Robot_x
     y1 = estado_comprobar.Robot_y
