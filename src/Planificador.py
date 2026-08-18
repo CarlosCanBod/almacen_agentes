@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from time import time
-from typing import Any
 
 from EstructurasDatos.ColaPrioridad import ColaPrio
 from EstructurasDatos.Objetos import Palet, Estado
@@ -344,7 +343,7 @@ class Busqueda:
 
             self.nodos_expandidos += 1
 
-        estado_gir_der: Estado = girar(estado_sacado, self.entorno, False)
+        estado_gir_der: Estado | None = girar(estado_sacado, self.entorno, False)
         if estado_gir_der is not None:
             coste_h = self.heuristica_total(estado_gir_der)
 
@@ -361,7 +360,7 @@ class Busqueda:
 
             self.nodos_expandidos += 1
 
-        estado_gir_izq: Estado = girar(estado_sacado, self.entorno, True)
+        estado_gir_izq: Estado | None = girar(estado_sacado, self.entorno, True)
         if estado_gir_izq is not None:
             coste_h = self.heuristica_total(estado_gir_izq)
 
@@ -511,7 +510,7 @@ def levantar_bajar(estado: Estado) -> Estado | None:
     return None
 
 
-def girar(estado: Estado, entorno: list[list[int]], izquierda: bool = True) -> Any:
+def girar(estado: Estado, entorno: list[list[int]], izquierda: bool = True) -> Estado | None:
     """
         Gira el robot a la izquierda
         Si no tiene palet no hay requisitos para girar

@@ -41,6 +41,7 @@ class TestColaPrio(unittest.TestCase):
             self.assertEqual(nodo.dato, 5 * i)
 
 
+# noinspection bad-assignment
 class TestBusqueda(unittest.TestCase):
 
     def test_expansion(self):
@@ -76,6 +77,15 @@ class TestBusqueda(unittest.TestCase):
         self.assertEqual(estado_girado.Robot_orientacion, "O")
         estado_girado: Estado = girar(estado_girado, entorno, izquierda=True)
         self.assertEqual(estado_girado.Robot_orientacion, "S")
+
+    def test_levantar(self):
+        lista_palets = [Palet(2, 2, False, 1, 1, False)]
+
+        estado_inicial = Estado(0, 0, "S", False, lista_palets)
+
+        entorno = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
+
+        estado_nuevo = levantar_bajar(estado_inicial)
 
 
 if __name__ == "__main__":
